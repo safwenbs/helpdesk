@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Helpdesk dashboard</title>
+    <title>{% block title %}Helpdesk dashboard{% endblock %}</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="{{ asset('bundles/helpdesk/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -29,6 +29,7 @@
     <!-- Custom Fonts -->
     <link href="{{ asset('bundles/helpdesk/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
 
+    {% block addStyles %} {% endblock %}
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -39,7 +40,7 @@
 </head>
 
 <body>
-
+    {% block content %}
     <div id="wrapper">
 
         <!-- Navigation -->
@@ -918,7 +919,7 @@
 
     </div>
     <!-- /#wrapper -->
-
+    {% endblock %}
     <!-- jQuery -->
     <script src="{{ asset('bundles/helpdesk/js/jquery.min.js') }}"></script>
 
@@ -935,6 +936,7 @@
 
     <!-- Custom Theme JavaScript -->
     <script src="{{ asset('bundles/helpdesk/js/sb-admin-2.js') }}"></script>
+    {% block addScripts %} {% endblock %}
 
 </body>
 
