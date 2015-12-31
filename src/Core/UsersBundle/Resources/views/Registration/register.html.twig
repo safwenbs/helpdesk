@@ -1,0 +1,70 @@
+{% extends 'CoreUsersBundle::layout.html.twig' %}
+{% block title %}Helpdesk registration page{% endblock %}
+{% block fos_user_content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4">
+                <div class="login-panel panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Please Sign Up</h3>
+                    </div>
+                    <div class="panel-body">
+                        
+                        {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register'}}) }}
+                            {{ form_widget(form._token) }}
+                            <fieldset>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">First name</label>
+                                    <div class="col-sm-12">
+                                        {{ form_widget(form.firstName,  {'attr': {'required':'required','class':'form-control'} }) }}
+                                        {{ form_errors(form.firstName) }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Last name</label>
+                                    <div class="col-sm-12">
+                                        {{ form_widget(form.lastName,  {'attr': {'required':'required','class':'form-control'} }) }}
+                                        {{ form_errors(form.lastName) }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Email</label>
+                                    <div class="col-sm-12">
+                                        {{ form_widget(form.email,  {'attr': {'required':'required','class':'form-control', 'type':'email'} }) }}
+                                        {{ form_errors(form.email) }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Username</label>
+                                    <div class="col-sm-12">
+                                        {{ form_widget(form.username,  {'attr': {'required':'required','class':'form-control'} }) }}
+                                        {{ form_errors(form.username) }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Password</label>
+                                    <div class="col-sm-12">
+                                        {{ form_widget(form.plainPassword.first,  {'attr': {'required':'required','class':'form-control','type':'password'} }) }}
+                                        {{ form_errors(form.plainPassword.first) }}
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Repeat password</label>
+                                    <div class="col-sm-12">
+                                        {{ form_widget(form.plainPassword.second,  {'attr': {'required':'required','class':'form-control','type':'password'} }) }}
+                                        {{ form_errors(form.plainPassword.second) }}
+                                    </div>
+                                </div>
+                            </fieldset>
+                        {{ form_widget(form) }}
+                            <div style="margin-top: 20px;">
+                                <input class="btn btn-lg btn-success btn-block" type="submit" value="Register" />
+                            </div>
+                        {{ form_end(form) }}
+                        
+                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -9,6 +9,11 @@
                         <h3 class="panel-title">Please Sign In</h3>
                     </div>
                     <div class="panel-body">
+                        {% for flashMessage in app.session.flashbag.get('addUser') %}
+                            <div class="alert alert-success">
+                            {{ flashMessage }}
+                            </div>
+                        {% endfor %}
                         {% if error %}
                             <div class="alert alert-danger">
                                 {{ error.messageKey|trans(error.messageData, 'security') }}
@@ -27,7 +32,9 @@
                                     <label>
                                         <input id="remember_me" name="_remember_me" value="on" type="checkbox" >Remember Me
                                     </label>
+                                    <a href="{{path('fos_user_registration_register')}}" style="float: right;text-decoration: underline;" >Register</a>
                                 </div>
+                                
                                 <!-- Change this to a button or input when using this as a form -->
                                 <input class="btn btn-lg btn-success btn-block" type="submit" id="_submit" name="_submit" value="Login" />
                             </fieldset>

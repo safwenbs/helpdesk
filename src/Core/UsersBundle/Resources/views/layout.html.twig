@@ -1,6 +1,18 @@
 {% extends  "::dashboard.html.twig" %}
 
 {% block title %}Login page{% endblock %}
+{% block addStyles %}
+    <style>
+        fieldset ul li
+        {
+            color: red;
+            font-size: 12px;
+            margin-top: 10px;
+            float: left;
+            text-align: left;
+        }
+    </style>
+{% endblock %}
 
 {% block content %}
     {% block fos_user_content %}
