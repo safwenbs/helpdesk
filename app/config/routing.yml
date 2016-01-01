@@ -1,6 +1,6 @@
 core_dashboard:
     resource: "@CoreDashboardBundle/Resources/config/routing.yml"
-    prefix:   /
+    prefix:   /dashboard
 
 core_users:
     resource: "@CoreUsersBundle/Resources/config/routing.yml"
