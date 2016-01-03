@@ -1,0 +1,54 @@
+{% extends  "::dashboard.html.twig" %}
+{% block title %}Show profile{% endblock %}
+{% block header %}Show profile {% endblock %}
+{% block mainpage %}
+    <div class="col-lg-6">
+        {% for flashMessage in app.session.flashbag.get('editPassword') %}
+            <div class="alert alert-success">
+                {{ flashMessage }}
+            </div>
+        {% endfor %}
+        {% for flashMessage in app.session.flashbag.get('editUser') %}
+            <div class="alert alert-success">
+                {{ flashMessage }}
+            </div>
+        {% endfor %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                 {{user.firstname}} {{user.lastname}}
+            </div>
+            <div class="panel-body">
+                <p>User last login date on:
+                    {% if user.lastlogin is not null %}
+                        {{user.lastlogin|date('d/m/Y à h:i')}}
+                    {% else %}
+                        Never connected
+                    {% endif %}
+                </p>
+                <h4>Role</h4>
+                <p>
+                    {% if user.granted('ROLE_ADMIN') %}
+                        Administrator
+                    {% elseif user.granted('ROLE_EXTERNAL') %}
+                        External
+                    {% elseif user.granted('ROLE_INTERNAL_RECEPTION') %}
+                        Internal Reception
+                    {% elseif user.granted('ROLE_INTERNAL_ACCOUNTING') %}
+                        Internal Accounting
+                    {% elseif user.granted('ROLE_INTERNAL_ADMINISTRATION') %}
+                        Internal Administration
+                    {% elseif user.granted('ROLE_INTERNAL_IT') %}
+                        Internal IT
+                    {% endif %}
+                </p>
+                <address>
+                    <strong>{{user.firstname}} {{user.lastname}}</strong>
+                    <br/>
+                    <strong>Username: {{user.username}}</strong>
+                    <br>
+                    <a href="mailto:{{user.email}}">{{user.email}}</a>
+                </address>
+            </div>
+        </div>
+    </div>
+{% endblock %}

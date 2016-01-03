@@ -74,3 +74,6 @@ fos_user:
     registration:
         form:
             type: Core\UsersBundle\Form\Type\RegistrationFormType
+    profile:
+        form:
+            type: Core\UsersBundle\Form\Type\ProfileFormType

@@ -8,3 +8,7 @@ services:
         class: CoreUsersBundle\Form\Type\RegistrationFormType
         tags:
             - { name: form.type, alias: core_user_registration }
+    core.form.profile:
+        class: CoreUsersBundle\Form\Type\ProfileFormType
+        tags:
+            - { name: form.type, alias: helpdesk_user_profile }

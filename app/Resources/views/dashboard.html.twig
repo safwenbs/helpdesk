@@ -122,18 +122,21 @@
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Helpdesk dashboard</h1>
+                    <h1 class="page-header">{% block header %}Helpdesk dashboard{% endblock %}</h1>
                 </div>
             </div>
             {{render(controller('CoreDashboardBundle:Dashboard:badge'))}}
+            
             <div class="row">
-                {% if user.granted('ROLE_ADMIN') %}
-                
-                {% elseif user.granted('ROLE_EXTERNAL') %}
-                    
-                {% else %}
-                    
-                {% endif %}
+                {% block mainpage %}
+                    {% if user.granted('ROLE_ADMIN') %}
+
+                    {% elseif user.granted('ROLE_EXTERNAL') %}
+
+                    {% else %}
+
+                    {% endif %}
+                {% endblock %}
             </div>
         </div>
     </div>
