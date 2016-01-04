@@ -92,13 +92,13 @@
                         </li>
                         {% if user.granted('ROLE_ADMIN') %}
                             <li>
-                                <a href="#"><i class="fa fa-list"></i> Externals list<span class="fa arrow"></span></a>
+                                <a href="#"><i class="fa fa-list"></i> Internals list<span class="fa arrow"></span></a>
                                 <ul class="nav nav-second-level">
                                     <li>
-                                        <a href="#">View all</a>
+                                        <a href="{{path('internals')}}">View all</a>
                                     </li>
                                     <li>
-                                        <a href="#">Add an external</a>
+                                        <a href="{{path('new_internal')}}">Add an internal</a>
                                     </li>
                                 </ul>
                             </li>
@@ -129,15 +129,11 @@
             
             <div class="row">
                 {% block mainpage %}
-                    {% if user.granted('ROLE_ADMIN') %}
-
-                    {% elseif user.granted('ROLE_EXTERNAL') %}
-
-                    {% else %}
-
-                    {% endif %}
+                
                 {% endblock %}
             </div>
+    
+            
         </div>
     </div>
     {% endblock %}

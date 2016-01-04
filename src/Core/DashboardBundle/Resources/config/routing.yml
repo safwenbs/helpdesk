@@ -1,3 +1,12 @@
 core_dashboard_homepage:
     path:     /
     defaults: { _controller: CoreDashboardBundle:Default:index }
+new_internal:
+    path:     /home/internals/new
+    defaults: { _controller: CoreDashboardBundle:Internal:new }
+internal_create:
+    path:     /home/internals/create
+    defaults: { _controller: CoreDashboardBundle:Internal:create }
+internals:
+    path:     /home/internals
+    defaults: { _controller: CoreDashboardBundle:Internal:list }
