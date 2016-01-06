@@ -92,4 +92,67 @@ class InternalController extends Controller
         return $this->render('CoreDashboardBundle:Internals:list.html.twig',array('user'=>$user,'internals'=>$pagination));
        
     }
+    
+    public function editAction($id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->container->get('security.context')->getToken()->getUser();
+        
+        $internal = $em->getRepository("CoreUsersBundle:User")->find($id);
+        
+        return $this->render('CoreDashboardBundle:Internals:edit.html.twig',array('user'=>$user,'internal'=>$internal));
+        
+    }
+    
+    public function updateAction($id,Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        
+        $data = $request->request;
+        
+        $firstname = $data->get('firstname');
+        $lastname = $data->get('lastname');
+        $enabled = $data->get('enabled');
+        $role = $data->get('role');
+        
+        $internal = $em->getRepository("CoreUsersBundle:User")->find($id);
+        
+        $internal->setFirstName($firstname);
+        $internal->setLastName($lastname);
+        $internal->setEnabled($enabled);
+        if ($internal->isGranted('ROLE_INTERNAL_ACCOUNTING')) {
+            $oldRole = 'ROLE_INTERNAL_ACCOUNTING';
+        } elseif ($internal->isGranted('ROLE_INTERNAL_ADMINISTRATION')) {
+            $oldRole = 'ROLE_INTERNAL_ADMINISTRATION';
+        } elseif ($internal->isGranted('ROLE_INTERNAL_RECEPTION')) {
+            $oldRole = 'ROLE_INTERNAL_RECEPTION';
+        } else {
+            $oldRole = 'ROLE_INTERNAL_IT';
+        }
+        
+        $internal->removeRole($oldRole);
+        $internal->addRole($role);
+        
+        $em->persist($internal);
+        $em->flush();
+        
+        $this->get('session')->getFlashBag()->add('editInternal', 'Internal edited successfully.');
+        $url = $this->generateUrl('internals');
+        $response = new RedirectResponse($url);
+        return $response;
+    }
+    
+    public function deleteAction($id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $internal = $em->getRepository("CoreUsersBundle:User")->find($id);
+        
+        $em->remove($internal);
+        $em->flush();
+         
+        $this->get('session')->getFlashBag()->add('deleteInternal', 'Internal deleted successfully.');
+        $url = $this->generateUrl('internals');
+        $response = new RedirectResponse($url);
+        return $response;
+    }
 }

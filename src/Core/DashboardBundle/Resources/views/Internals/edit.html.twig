@@ -1,0 +1,50 @@
+{% extends  "::dashboard.html.twig" %}
+{% block title %}Edit internal{% endblock %}
+{% block header %}Edit internal {% endblock %}
+{% block mainpage %}
+    <div class="col-lg-6">
+        
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Edit internal
+            </div>
+            <div class="panel-body">
+                <form role="form"  action="{{ path('internal_update',{'id':internal.id}) }}" method="POST">
+                    <div class="form-group">
+                        <label>Firstname</label>
+                        <input name="firstname" type="text" value="{{internal.firstname}}" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Lastname</label>
+                        <input name="lastname" type="text" value="{{internal.lastname}}" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="enabled" id="optionsRadios1" value="1" {% if internal.enabled %}checked{% endif %}>Enabled
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="enabled" id="optionsRadios2" value="0" {% if internal.enabled == 0 %}checked{% endif %}>Disabled
+                            </label>
+                        </div>
+                     </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select name="role" class="form-control">
+                            <option value="ROLE_INTERNAL_RECEPTION" {% if internal.granted('ROLE_INTERNAL_RECEPTION') %} selected{% endif %}>Reception</option>
+                            <option value="ROLE_INTERNAL_ACCOUNTING" {% if internal.granted('ROLE_INTERNAL_ACCOUNTING') %} selected{% endif %}>Accounting</option>
+                            <option value="ROLE_INTERNAL_ADMINISTRATION" {% if internal.granted('ROLE_INTERNAL_ADMINISTRATION') %} selected{% endif %}>Administration</option>
+                            <option value="ROLE_INTERNAL_IT" {% if internal.granted('ROLE_INTERNAL_IT') %} selected{% endif %}>IT</option>
+                        </select>
+                    </div>
+                    
+                    <input type="submit" class="btn btn-primary" value="Edit" />
+                </form>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

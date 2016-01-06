@@ -17,11 +17,11 @@ class DefaultController extends Controller
         }
         elseif ($user->isGranted('ROLE_EXTERNAL'))
         {
-        
+           $url = $this->generateUrl('my_messages');
         }
         else
         {
-            
+            $url = $this->generateUrl('messages_internals');
         }
         $response = new RedirectResponse($url);
         return $response;

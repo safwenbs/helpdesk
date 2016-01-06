@@ -1,0 +1,31 @@
+{% extends  "::dashboard.html.twig" %}
+{% block title %}Demands{% endblock %}
+{% block header %}Configure demands {% endblock %}
+{% block mainpage %}
+    <div class="col-lg-6">
+        {% for flashMessage in app.session.flashbag.get('editDemands') %}
+            <div class="alert alert-info">
+                {{ flashMessage }}
+            </div>
+        {% endfor %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Configure demands
+            </div>
+            <div class="panel-body">
+                <form role="form"  action="{{path('demand_configure')}}" method="POST">
+                    {% for demand in demands %}
+                    <div class="form-group">
+                          <label>{{demand.demandType}}</label>
+                          <input class="form-control" type="text" name="{{demand.demandType}}" value="{{demand.nbDaysTreatement}}" pattern="\d*" required />
+                    </div>
+                    {% endfor %}
+                    
+                    
+                    <input type="submit" class="btn btn-primary" value="Configure" />
+                </form>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

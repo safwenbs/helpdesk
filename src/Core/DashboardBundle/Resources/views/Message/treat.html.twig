@@ -1,0 +1,108 @@
+{% extends  "::dashboard.html.twig" %}
+{% block title %} Request {% endblock %}
+{% block header %} Treat request {% endblock %}
+{% block mainpage %}
+<div class="col-lg-6">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Request details
+        </div>
+        <div class="panel-body">
+            <dl>
+                <dt>Subject: </dt>
+                <dd>{{message.subject}}</dd>
+                <dt>Message: </dt>
+                <dd>{{message.message}}</dd>
+                <dt>Created on: </dt>
+                <dd>{{message.createdOn|date('d-m-Y')}}</dd>
+                <dt>Created By: </dt>
+                <dd>{{message.createdBy.firstname}} {{message.createdBy.lastname}}</dd>
+                <dt>Contact type: </dt>
+                <dd>{{message.contactType}}</dd>
+                <dt>Demand type: </dt>
+                <dd>{{message.demandType.demandType}}</dd>
+                <dt>Current service: </dt>
+                <dd>{{message.currentService}}</dd>
+                <dt>Status: </dt>
+                <dd>{{message.status}}</dd>
+                <dt>Code: </dt>
+                <dd>{{message.code}}</dd>
+                <dt>Is viewed: </dt>
+                <dd>{% if message.isviewed %}Yes{% else %}No{% endif %}</dd>
+                <dt>Is treated: </dt>
+                <dd>{% if message.isTreated %}Yes{% else %}No{% endif %}</dd>
+                <dt>Should be treated before: </dt>
+                <dd>{{message.ExpireOn|date('d-m-Y')}}</dd>
+                {% if message.isviewed %}
+                <dt>Viewed By: </dt>
+                <dd>{{message.viewedBy.firstname}} {{message.viewedBy.lastname}} (Reception Dependence)</dd>
+                {% endif %}
+                
+            </dl>
+                <a href="#" class="btn btn-info" data-toggle="modal" data-target="#modal-move-request">Move</a>
+                <a href="#" class="btn btn-warning" data-toggle="modal" data-target="#modal-close-request">Close</a>
+            
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal-move-request" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                  <h4 class="modal-title">Move a request</h4>
+              </div>
+              <div class="modal-body">
+                  To which dependence you want to move this request ?
+                  <br/>
+                  <p style="margin-top: 20px;text-align: center;">
+                      {% if message.currentService == 'Reception' %}
+                          <a href="{{path('move_message',{'id':message.id,'service':'Accounting'})}}" class="btn btn-info">Accounting</a>
+                          <a href="{{path('move_message',{'id':message.id,'service':'Administration'})}}" class="btn btn-info">Administration</a>
+                          <a href="{{path('move_message',{'id':message.id,'service':'It'})}}" class="btn btn-info">IT</a>
+                      {% elseif message.currentService == 'Administration' %}
+                          <a href="{{path('move_message',{'id':message.id,'service':'Reception'})}}" class="btn btn-info">Reception</a>
+                          <a href="{{path('move_message',{'id':message.id,'service':'Accounting'})}}" class="btn btn-info">Accounting</a>
+                          <a href="{{path('move_message',{'id':message.id,'service':'It'})}}" class="btn btn-info">IT</a>
+                      {% elseif message.currentService == 'Accounting' %}
+                          <a href="{{path('move_message',{'id':message.id,'service':'Reception'})}}" class="btn btn-info">Reception</a>
+                          <a href="{{path('move_message',{'id':message.id,'service':'Administration'})}}" class="btn btn-info">Administration</a>
+                          <a href="{{path('move_message',{'id':message.id,'service':'It'})}}" class="btn btn-info">IT</a>
+                      {% else %}
+                          <a href="{{path('move_message',{'id':message.id,'service':'Reception'})}}" class="btn btn-info">Reception</a>
+                          <a href="{{path('move_message',{'id':message.id,'service':'Administration'})}}" class="btn btn-info">Administration</a>
+                          <a href="{{path('move_message',{'id':message.id,'service':'Accounting'})}}" class="btn btn-info">Accounting</a>
+                      {% endif %}
+                    
+                  </p>
+              </div>
+              <div class="modal-footer">
+                  <a class="btn btn-white" data-dismiss="modal">Close</a>
+              </div>
+          </div>
+      </div>
+  </div>
+  <div class="modal fade" id="modal-close-request" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <form action="{{path('close_message',{'id':message.id})}}" method="POST" role="form">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title">Close a request</h4>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure to close this request ?
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label>Response to be sent to external</label>
+                            <textarea name="responseText" class="form-control" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-white" data-dismiss="modal">Cancel</a>
+                        <input type="submit" class="btn btn-success" value="Close" >
+                    </div>
+              </form>
+          </div>
+      </div>
+  </div>
+{% endblock %}

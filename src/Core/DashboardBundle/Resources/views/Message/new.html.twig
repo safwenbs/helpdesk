@@ -1,0 +1,45 @@
+{% extends  "::dashboard.html.twig" %}
+{% block title %}Message{% endblock %}
+{% block header %}New message {% endblock %}
+{% block mainpage %}
+    <div class="col-lg-6">
+        
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                New message
+            </div>
+            <div class="panel-body">
+                <form role="form"  action="{{path('message_create')}}" method="POST">
+                    <div class="form-group">
+                          <label>Demand type</label>
+                          <select name="demandType" class="form-control">
+                              {% for demand in demands %}
+                                  <option value="{{demand.id}}">{{demand.demandType}}</option>
+                              {% endfor %}
+                          </select>
+                    </div>
+                    <div class="form-group">
+                          <label>Contact type</label>
+                          <select name="contactType" class="form-control">
+                              <option value="mail">Email</option>
+                              <option value="adress">Adress</option>
+                          </select>
+                    </div>
+                    <div class="form-group">
+                          <label>Subject</label>
+                          <input type="text" name="subject" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                          <label>Message</label>
+                          <textarea name="message" class="form-control" required ></textarea>
+                    </div>
+                   
+                    
+                    
+                    <input type="submit" class="btn btn-primary" value="Send" />
+                </form>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

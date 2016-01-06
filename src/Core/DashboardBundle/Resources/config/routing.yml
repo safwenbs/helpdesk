@@ -10,3 +10,48 @@ internal_create:
 internals:
     path:     /home/internals
     defaults: { _controller: CoreDashboardBundle:Internal:list }
+internal_edit:
+    path:     /home/internals/edit/{id}
+    defaults: { _controller: CoreDashboardBundle:Internal:edit }
+internal_update:
+    path:     /home/internals/update/{id}
+    defaults: { _controller: CoreDashboardBundle:Internal:update }
+internal_delete:
+    path:     /home/internals/delete/{id}
+    defaults: { _controller: CoreDashboardBundle:Internal:delete }
+demands:
+    path:     /home/demands
+    defaults: { _controller: CoreDashboardBundle:Demand:demands }
+demand_configure:
+    path:     /home/demands/configure
+    defaults: { _controller: CoreDashboardBundle:Demand:configure }
+my_messages:
+    path:     /home/message
+    defaults: { _controller: CoreDashboardBundle:Message:list }
+write_message:
+    path:     /home/message/write
+    defaults: { _controller: CoreDashboardBundle:Message:write }
+message_create:
+    path:     /home/message/create
+    defaults: { _controller: CoreDashboardBundle:Message:create }
+message_details:
+    path:     /home/message/details/{id}
+    defaults: { _controller: CoreDashboardBundle:Message:view }
+messages_internals:
+    path:     /home/message/internals
+    defaults: { _controller: CoreDashboardBundle:Message:internal }
+treat_message:
+    path:     /home/message/internals/treat/{id}
+    defaults: { _controller: CoreDashboardBundle:Message:treat }
+move_message:
+    path:     /home/message/internals/move/{id}/{service}
+    defaults: { _controller: CoreDashboardBundle:Message:move }
+close_message:
+    path:     /home/message/internals/close/{id}
+    defaults: { _controller: CoreDashboardBundle:Message:close }
+messages_see_type:
+    path:     /home/message/internals/type/{type}
+    defaults: { _controller: CoreDashboardBundle:Message:type }
+see_message:
+    path:     /home/message/internals/type/see/{id}
+    defaults: { _controller: CoreDashboardBundle:Message:see }

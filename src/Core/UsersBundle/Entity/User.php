@@ -12,6 +12,7 @@ namespace Core\UsersBundle\Entity;
 
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity
@@ -61,6 +62,7 @@ class User extends BaseUser
     {
         parent::__construct();
         $this->createdOn = new \DateTime("now");
+        $this->messages = new ArrayCollection();
     }
     
     public function isGranted($role)
@@ -102,6 +104,16 @@ class User extends BaseUser
 
     function setCreatedOn(\DateTime $createdOn) {
         $this->createdOn = $createdOn;
+    }
+    
+    /**
+     * @ORM\OneToMany(targetEntity="\Core\DashboardBundle\Entity\Message", mappedBy="createdBy" , cascade={"remove"})
+     */
+    protected $messages;
+    
+    function getMessages()
+    {
+        return $this->messages;
     }
 
 

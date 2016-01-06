@@ -1,0 +1,23 @@
+<p>
+Info !!!
+</p>
+<p>
+    You have created a request on {{message.createdOn|date('d-m-Y')}} at helpdesk platform
+    We can inform you that your request has been well treated and is now closed by our internal resources
+    The details are
+    <ul>
+        <li>Subject :<br/> {{message.subject}}</li>
+        <li>Message:<br/> {{message.message}}</li>
+        <li>Created On <br/> {{message.createdOn|date('d-m-Y')}}</li>
+        <li>Demand Type <br/>{{message.demandType.demandType}}</li>
+        <li>Service : <br/>{{message.currentService}} </li>
+        <li>Status : <br/>{{message.status}}</li>
+        <li>Request code : <br/>{{message.code}}</li>
+        <li>Closed On <br/> {{message.closedOn|date('d-m-Y')}}</li>
+        <li>Closed By <br/> {{message.closedBy.firstname}} {{message.closedBy.lastname}}</li>
+        <li>Response text <br/> {{message.responseText}}</li>
+    </ul>
+</p>
+<p>
+    Best Wishes Helpdesk Team.
+</p>

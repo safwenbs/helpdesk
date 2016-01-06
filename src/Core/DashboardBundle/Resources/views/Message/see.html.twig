@@ -1,0 +1,54 @@
+{% extends  "::dashboard.html.twig" %}
+{% block title %} Request {% endblock %}
+{% block header %} {{message.status}} request {% endblock %}
+{% block mainpage %}
+<div class="col-lg-6">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            {{message.status}} request details
+        </div>
+        <div class="panel-body">
+            <dl>
+                <dt>Subject: </dt>
+                <dd>{{message.subject}}</dd>
+                <dt>Message: </dt>
+                <dd>{{message.message}}</dd>
+                <dt>Created on: </dt>
+                <dd>{{message.createdOn|date('d-m-Y')}}</dd>
+                <dt>Created By: </dt>
+                <dd>{{message.createdBy.firstname}} {{message.createdBy.lastname}}</dd>
+                <dt>Contact type: </dt>
+                <dd>{{message.contactType}}</dd>
+                <dt>Demand type: </dt>
+                <dd>{{message.demandType.demandType}}</dd>
+                <dt>Service: </dt>
+                <dd>{{message.currentService}}</dd>
+                <dt>Status: </dt>
+                <dd>{{message.status}}</dd>
+                <dt>Code: </dt>
+                <dd>{{message.code}}</dd>
+                <dt>Is viewed: </dt>
+                <dd>{% if message.isviewed %}Yes{% else %}No{% endif %}</dd>
+                <dt>Is treated: </dt>
+                <dd>{% if message.isTreated %}Yes{% else %}No{% endif %}</dd>
+                <dt>Should be treated before: </dt>
+                <dd>{{message.ExpireOn|date('d-m-Y')}}</dd>
+                {% if message.isviewed %}
+                <dt>Viewed By: </dt>
+                <dd>{{message.viewedBy.firstname}} {{message.viewedBy.lastname}} (Reception Dependence)</dd>
+                {% endif %}
+                {% if message.status =='closed' %}
+                <dt>Closed By: </dt>
+                <dd>{{message.closedBy.firstname}} {{message.closedBy.lastname}}</dd>
+                <dt>Closed on: </dt>
+                <dd>{{message.closedOn|date('d-m-Y')}}</dd>
+                <dt>Response: </dt>
+                <dd>{{message.responseText}}</dd>
+                {% else %}
+                <dt>Archived because it has not been treated in time  </dt>
+                {% endif %}
+            </dl>
+         </div>
+    </div>
+</div>
+{% endblock %}

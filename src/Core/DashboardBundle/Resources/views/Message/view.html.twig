@@ -1,0 +1,50 @@
+{% extends  "::dashboard.html.twig" %}
+{% block title %} Messages {% endblock %}
+{% block header %} Message details {% endblock %}
+{% block mainpage %}
+<div class="col-lg-6">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Message details
+        </div>
+        <div class="panel-body">
+            <dl>
+                <dt>Subject: </dt>
+                <dd>{{message.subject}}</dd>
+                <dt>Message: </dt>
+                <dd>{{message.message}}</dd>
+                <dt>Created on: </dt>
+                <dd>{{message.createdOn|date('d-m-Y')}}</dd>
+                <dt>Contact type: </dt>
+                <dd>{{message.contactType}}</dd>
+                <dt>Demand type: </dt>
+                <dd>{{message.demandType.demandType}}</dd>
+                <dt>Current service: </dt>
+                <dd>{{message.currentService}}</dd>
+                <dt>Status: </dt>
+                <dd>{{message.status}}</dd>
+                {% if message.status =='closed' %}
+                <dt>Closed By: </dt>
+                <dd>{{message.closedBy.firstname}} {{message.closedBy.lastname}}</dd>
+                <dt>Closed on: </dt>
+                <dd>{{message.closedOn|date('d-m-Y')}}</dd>
+                <dt>Response: </dt>
+                <dd>{{message.responseText}}</dd>
+                {% elseif message.status =='archived'  %}
+                <dt>Archived because it has not been treated in time  </dt>
+                {% endif %}
+                <dt>Code: </dt>
+                <dd>{{message.code}}</dd>
+                <dt>Is viewed: </dt>
+                <dd>{% if message.isviewed %}Yes{% else %}No{% endif %}</dd>
+                <dt>Is treated: </dt>
+                <dd>{% if message.isTreated %}Yes{% else %}No{% endif %}</dd>
+                <dt>Should be treated before: </dt>
+                <dd>{{message.ExpireOn|date('d-m-Y')}}</dd>
+                
+            </dl>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
