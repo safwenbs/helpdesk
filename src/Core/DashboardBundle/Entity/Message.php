@@ -98,6 +98,13 @@ class Message
     /**
      * @var boolean
      *
+     * @ORM\Column(name="canBeViewed", type="boolean", nullable=true)
+     */
+    private $canBeViewed;
+    
+    /**
+     * @var boolean
+     *
      * @ORM\Column(name="isTreated", type="boolean", nullable=true)
      */
     private $isTreated;
@@ -165,6 +172,7 @@ class Message
         $this->isTreated = FALSE;
         $this->isViewed = FALSE;
         $this->status = "opened";
+        $this->canBeViewed = FALSE;
     }
     
     function getCreatedOn() {
@@ -313,7 +321,16 @@ class Message
     function setResponseText($responseText) {
         $this->responseText = $responseText;
     }
+    function getCanBeViewed() {
+        return $this->canBeViewed;
+    }
+
+    function setCanBeViewed($canBeViewed) {
+        $this->canBeViewed = $canBeViewed;
+    }
 
 
+    
+    
 
 }

@@ -18,6 +18,11 @@
                 {{ flashMessage }}
             </div>
     {% endfor %}
+    {% for flashMessage in app.session.flashbag.get('setBoss') %}
+            <div class="alert alert-info">
+                {{ flashMessage }}
+            </div>
+    {% endfor %}
     <div class="panel panel-default">
         <div class="panel-heading">
             Internals List :   {{ internals.getTotalItemCount }}
@@ -35,6 +40,7 @@
                             <th>{{ knp_pagination_sortable(internals, 'Email', 'u.email') }}</th>
                             <th>Enabled</th>
                             <th>Role</th>
+                            <th>Is Boss</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -64,8 +70,15 @@
                                 {% endif %}
                             </td>
                             <td>
+                                {% if internal.isBoss %}
+                                    Yes
+                                {% else %}
+                                    No
+                                {% endif %}
+                            </td>
+                            <td>
                                 <a href="{{path('internal_edit',{'id':internal.id})}}"  class="btn btn-primary">Edit</a>
-                                <a href="#" data-internal-id="{{internal.id}}" data-internal-name="{{internal.firstname}} {{internal.lastname}}" data-toggle="modal" data-target="#modal-delete-internal" class="btn btn-danger btn-delete-internal">Delete</a>
+{#                                <a href="#" data-internal-id="{{internal.id}}" data-internal-name="{{internal.firstname}} {{internal.lastname}}" data-toggle="modal" data-target="#modal-delete-internal" class="btn btn-danger btn-delete-internal">Delete</a>#}
                                 
                             </td>
                         </tr>

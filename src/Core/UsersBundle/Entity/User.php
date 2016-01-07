@@ -57,6 +57,13 @@ class User extends BaseUser
      * @ORM\Column(name="createdOn", type="datetime", nullable=true)
      */
     private $createdOn;
+    
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="isBoss", type="boolean", nullable=true)
+     */
+    private $isBoss;
 
     public function __construct()
     {
@@ -106,6 +113,15 @@ class User extends BaseUser
         $this->createdOn = $createdOn;
     }
     
+    function getIsBoss() {
+        return $this->isBoss;
+    }
+
+    function setIsBoss($isBoss) {
+        $this->isBoss = $isBoss;
+    }
+
+        
     /**
      * @ORM\OneToMany(targetEntity="\Core\DashboardBundle\Entity\Message", mappedBy="createdBy" , cascade={"remove"})
      */
@@ -114,6 +130,12 @@ class User extends BaseUser
     function getMessages()
     {
         return $this->messages;
+    }
+    
+    public function setEmail($email)
+    {
+      parent::setEmail($email);
+      $this->setUsername($email);
     }
 
 

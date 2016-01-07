@@ -88,11 +88,22 @@ class MessageController extends Controller
         } else {
             $service = 'It';
         }
-        $messages = $em->createQuery("SELECT m FROM CoreDashboardBundle:Message m
-                                      WHERE m.currentService =:service
-                                      AND m.status NOT IN ('closed','archived')
-                                      ORDER BY m.createdOn DESC")->setParameter("service",$service);
-        
+        if($user->getIsBoss())
+        {
+          $messages = $em->createQuery("SELECT m FROM CoreDashboardBundle:Message m
+                                        WHERE m.currentService =:service
+                                        AND m.status NOT IN ('closed','archived')
+                                        ORDER BY m.createdOn DESC")->setParameter("service",$service);
+        }
+        else
+        {
+            $messages = $em->createQuery("SELECT m FROM CoreDashboardBundle:Message m
+                                          WHERE m.currentService =:service
+                                          AND m.status NOT IN ('closed','archived')
+                                          AND m.canBeViewed = 1
+                                          ORDER BY m.createdOn DESC")->setParameter("service",$service);
+            
+        }
         $paginator  = $this->get('knp_paginator');
         $pagination = $paginator->paginate($messages, $request->query->getInt('page', 1),10);
         
@@ -119,10 +130,32 @@ class MessageController extends Controller
         
         $message = $em->getRepository("CoreDashboardBundle:Message")->find($id);
         $message->setCurrentService($service);
+        $message->setCanBeViewed(FALSE);
         $em->persist($message);
         $em->flush();
         
         $this->get('session')->getFlashBag()->add('moveRequest', 'Request moved to '.$service.' service successfully !! ');
+        $url = $this->generateUrl('messages_internals');
+        $response = new RedirectResponse($url);
+        return $response;
+    }
+    public function shareAction($id,$share)
+    {
+        $em = $this->getDoctrine()->getManager();
+        
+        $message = $em->getRepository("CoreDashboardBundle:Message")->find($id);
+        $message->setCanBeViewed($share);
+        $em->persist($message);
+        $em->flush();
+        if ($share)
+        {
+            $notice = "Request shared with other dependence users successfully.";
+        }
+        else
+        {
+            $notice = "The sharing of this request has been disabled with other dependence users successfully.";
+        }
+        $this->get('session')->getFlashBag()->add('shareRequest', $notice);
         $url = $this->generateUrl('messages_internals');
         $response = new RedirectResponse($url);
         return $response;

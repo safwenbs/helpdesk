@@ -45,7 +45,7 @@ class ProfileFormType extends AbstractType
         $builder
                 ->add('firstname')
                 ->add('lastname')
-                ->add('username', null, array('label' => 'form.username', 'translation_domain' => 'FOSUserBundle'))
+                ->remove('username')
                 ->add('email', LegacyFormHelper::getType('Symfony\Component\Form\Extension\Core\Type\EmailType'), array('label' => 'form.email', 'translation_domain' => 'FOSUserBundle'))
                 ;
     }

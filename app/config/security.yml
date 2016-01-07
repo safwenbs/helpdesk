@@ -40,5 +40,8 @@ security:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/home/, roles: [ROLE_EXTERNAL, ROLE_INTERNAL_RECEPTION, ROLE_INTERNAL_ACCOUNTING, ROLE_INTERNAL_ADMINISTRATION, ROLE_INTERNAL_IT,ROLE_ADMIN ] }
         - { path: ^/profile/, roles: [ROLE_EXTERNAL, ROLE_INTERNAL_RECEPTION, ROLE_INTERNAL_ACCOUNTING, ROLE_INTERNAL_ADMINISTRATION, ROLE_INTERNAL_IT,ROLE_ADMIN ] }
+        - { path: ^/dashboard/home/admin, role: ROLE_ADMIN }
+        - { path: ^/dashboard/home/external, role: ROLE_EXTERNAL }
+        - { path: ^/dashboard/home/internals ,roles: [ROLE_INTERNAL_RECEPTION, ROLE_INTERNAL_ACCOUNTING, ROLE_INTERNAL_ADMINISTRATION, ROLE_INTERNAL_IT ] }
+        

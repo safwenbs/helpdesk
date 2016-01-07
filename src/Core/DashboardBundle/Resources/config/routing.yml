@@ -2,56 +2,65 @@ core_dashboard_homepage:
     path:     /
     defaults: { _controller: CoreDashboardBundle:Default:index }
 new_internal:
-    path:     /home/internals/new
+    path:     /home/admin/internals/new
     defaults: { _controller: CoreDashboardBundle:Internal:new }
 internal_create:
-    path:     /home/internals/create
+    path:     /home/admin/internals/create
     defaults: { _controller: CoreDashboardBundle:Internal:create }
 internals:
-    path:     /home/internals
+    path:     /home/admin/internals
     defaults: { _controller: CoreDashboardBundle:Internal:list }
 internal_edit:
-    path:     /home/internals/edit/{id}
+    path:     /home/admin/internals/edit/{id}
     defaults: { _controller: CoreDashboardBundle:Internal:edit }
 internal_update:
-    path:     /home/internals/update/{id}
+    path:     /home/admin/internals/update/{id}
     defaults: { _controller: CoreDashboardBundle:Internal:update }
 internal_delete:
-    path:     /home/internals/delete/{id}
+    path:     /home/admin/internals/delete/{id}
     defaults: { _controller: CoreDashboardBundle:Internal:delete }
 demands:
-    path:     /home/demands
+    path:     /home/admin/demands
     defaults: { _controller: CoreDashboardBundle:Demand:demands }
 demand_configure:
-    path:     /home/demands/configure
+    path:     /home/admin/demands/configure
     defaults: { _controller: CoreDashboardBundle:Demand:configure }
+dependence_boss:
+    path:     /home/admin/internals/bosses
+    defaults: { _controller: CoreDashboardBundle:Internal:bosses }
+set_boss_dependence:
+    path:     /home/admin/internals/bosses/set
+    defaults: { _controller: CoreDashboardBundle:Internal:setBoss }
 my_messages:
-    path:     /home/message
+    path:     /home/external/message
     defaults: { _controller: CoreDashboardBundle:Message:list }
 write_message:
-    path:     /home/message/write
+    path:     /home/external/message/write
     defaults: { _controller: CoreDashboardBundle:Message:write }
 message_create:
-    path:     /home/message/create
+    path:     /home/external/message/create
     defaults: { _controller: CoreDashboardBundle:Message:create }
 message_details:
-    path:     /home/message/details/{id}
+    path:     /home/external/message/details/{id}
     defaults: { _controller: CoreDashboardBundle:Message:view }
 messages_internals:
-    path:     /home/message/internals
+    path:     /home/internals/message/
     defaults: { _controller: CoreDashboardBundle:Message:internal }
 treat_message:
-    path:     /home/message/internals/treat/{id}
+    path:     /home/internals/message/treat/{id}
     defaults: { _controller: CoreDashboardBundle:Message:treat }
 move_message:
-    path:     /home/message/internals/move/{id}/{service}
+    path:     /home/internals/message/move/{id}/{service}
     defaults: { _controller: CoreDashboardBundle:Message:move }
 close_message:
-    path:     /home/message/internals/close/{id}
+    path:     /home/internals/message/close/{id}
     defaults: { _controller: CoreDashboardBundle:Message:close }
 messages_see_type:
-    path:     /home/message/internals/type/{type}
+    path:     /home/internals/message/type/{type}
     defaults: { _controller: CoreDashboardBundle:Message:type }
 see_message:
-    path:     /home/message/internals/type/see/{id}
+    path:     /home/internals/message/type/see/{id}
     defaults: { _controller: CoreDashboardBundle:Message:see }
+share_message:
+    path:     /home/internals/message/share/{id}/{share}
+    defaults: { _controller: CoreDashboardBundle:Message:share }

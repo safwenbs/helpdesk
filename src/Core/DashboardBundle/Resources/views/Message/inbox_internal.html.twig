@@ -13,6 +13,11 @@
                 {{ flashMessage }}
             </div>
     {% endfor %}
+    {% for flashMessage in app.session.flashbag.get('shareRequest') %}
+            <div class="alert alert-info">
+                {{ flashMessage }}
+            </div>
+    {% endfor %}
     <div class="panel panel-default">
         <div class="panel-heading">
             Requests received Total {{messages.getTotalItemCount}}

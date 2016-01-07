@@ -24,11 +24,11 @@
                          {{ form_widget(form.email,  {'attr': {'required':'required','class':'form-control','type':'email'} }) }}
                          {{ form_errors(form.email) }}
                     </div>
-                    <div class="form-group">
+                    {#<div class="form-group">
                         <label>Username</label>
                          {{ form_widget(form.username,  {'attr': {'class':'form-control'} }) }}
                          {{ form_errors(form.username) }}
-                    </div>
+                    </div>#}
                      <div class="form-group">
                         <label>Current password</label>
                          {{ form_widget(form.current_password,  {'attr': {'required':'required','class':'form-control','type':'password'} }) }}

@@ -10,6 +10,76 @@ use Core\UsersBundle\Entity\User;
 
 class InternalController extends Controller
 {
+    public function bossesAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->container->get('security.context')->getToken()->getUser();
+        /* RECEPTION */
+        $recpetion = "ROLE_INTERNAL_RECEPTION";
+        $receptionQuery   = "SELECT u FROM CoreUsersBundle:User u
+                             WHERE u.roles LIKE :reception
+                             AND u.enabled =1";
+        $recpetionInternals = $em->createQuery($receptionQuery)->setParameter('reception','%"' . $recpetion . '"%')->getResult();
+        
+        /* ACCOUNTING */
+        $accounting = "ROLE_INTERNAL_ACCOUNTING";
+        $accountingQuery   = "SELECT u FROM CoreUsersBundle:User u
+                             WHERE u.roles LIKE :accounting
+                             AND u.enabled =1";
+        $accountingInternals = $em->createQuery($accountingQuery)->setParameter('accounting','%"' . $accounting . '"%')->getResult();
+        
+        
+        /* ADMINISTRATION */
+        
+        $administration = "ROLE_INTERNAL_ADMINISTRATION";
+        $administrationQuery   = "SELECT u FROM CoreUsersBundle:User u
+                                  WHERE u.roles LIKE :administration
+                                  AND u.enabled =1";
+        $administrationInternals = $em->createQuery($administrationQuery)->setParameter('administration','%"' . $administration . '"%')->getResult();
+        
+        /*** IT ****/
+        
+        $it = "ROLE_INTERNAL_IT";
+        $itQuery   = "SELECT u FROM CoreUsersBundle:User u
+                      WHERE u.roles LIKE :it
+                      AND u.enabled =1";
+        $itInternals = $em->createQuery($itQuery)->setParameter('it','%"' . $it . '"%')->getResult();
+       
+        
+        return $this->render('CoreDashboardBundle:Internals:boss.html.twig',array('user'=>$user,'receptions'=>$recpetionInternals,'accountings'=>$accountingInternals,'administrations'=>$administrationInternals,'its'=>$itInternals));
+    
+        
+    }
+    
+    public function setBossAction(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $data = $request->request;
+        
+        if(!empty($data))
+        {
+            foreach ($data as $key=>$value)
+            {
+                $query = $em->createQuery("UPDATE CoreUsersBundle:User u
+                                           SET u.isBoss = 1
+                                           WHERE u.roles LIKE :role
+                                           AND u.id =:id")
+                            ->setParameters(array('role'=>'%"' . $key . '"%','id'=>$value))
+                            ->getResult();
+            }
+            $this->get('session')->getFlashBag()->add('setBoss', 'Dependence bosses configured successfully.');
+            $url = $this->generateUrl('internals');
+        }
+        else
+        {
+            $this->get('session')->getFlashBag()->add('notFoundBoss', 'There is no users in dependence please add first.');
+            $url = $this->generateUrl('dependence_boss');
+        }
+        
+        $response = new RedirectResponse($url);
+        return $response;
+    }
+
     public function newAction()
     {
         $user = $this->container->get('security.context')->getToken()->getUser();
@@ -57,6 +127,7 @@ class InternalController extends Controller
                     $internal->setPassword($password);
                     $internal->setCreatedBy($user);
                     $internal->setEnabled(TRUE);
+                    $internal->setIsBoss(FALSE);
                     $internal->setUsername($email);
                     $em->persist($internal);
                     $em->flush();
