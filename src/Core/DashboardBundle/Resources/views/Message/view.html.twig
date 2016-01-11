@@ -41,6 +41,12 @@
                 <dd>{% if message.isTreated %}Yes{% else %}No{% endif %}</dd>
                 <dt>Should be treated before: </dt>
                 <dd>{{message.ExpireOn|date('d-m-Y')}}</dd>
+                {% if message.attachments is not empty %}
+                  <dt>Attachments: </dt>
+                  {% for attachment in message.attachments %}
+                      <dd><a href="{{ asset('attachments/'~attachment.path) }}" download="{{ asset('attachments/'~attachment.path) }}">File {{loop.index}}</a></dd>
+                  {% endfor %}
+                {% endif %}
                 
             </dl>
             

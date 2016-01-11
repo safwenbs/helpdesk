@@ -5,6 +5,7 @@ namespace Core\DashboardBundle\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Core\DashboardBundle\Form\Type\InternalRegisterFormType;
 use Core\UsersBundle\Entity\User;
 
@@ -79,6 +80,31 @@ class InternalController extends Controller
         $response = new RedirectResponse($url);
         return $response;
     }
+    
+    public function checkBossAction($role)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $isBoss = $em->createQuery("SELECT u FROM CoreUsersBundle:User u
+                                    WHERE u.roles LIKE :role
+                                    AND u.isBoss =1")
+                     ->setParameter('role','%"' . $role . '"%')
+                     ->getResult();
+             
+        if(empty($isBoss))
+        {
+            $status = 'ok';
+            $message = "";
+        }
+        else 
+        {
+            $status = 'ko';
+            $name = $isBoss[0]->getFirstName(). " ".$isBoss[0]->getLastName();
+            $message =$name." is the boss in this dependence do you want to change it ?";
+        }
+        $response = new Response();
+        $response->setContent(json_encode(array('status'=>$status,'message'=>$message)));
+        return $response;
+    }
 
     public function newAction()
     {
@@ -122,12 +148,26 @@ class InternalController extends Controller
                 }
                 else
                 {
+                    $isBoss = $request->request->get('isBoss');
+                    if($isBoss ==='1')
+                    {
+                        $role = $form->getData()->getRoles()[0];
+                        $query = $em->createQuery("UPDATE CoreUsersBundle:User u
+                                                   SET u.isBoss = 0
+                                                   WHERE u.roles LIKE :role")
+                            ->setParameter('role','%"' . $role . '"%')
+                            ->getResult();
+                        $internal->setIsBoss(TRUE);
+                    }
+                    else
+                    {
+                        $internal->setIsBoss(FALSE);
+                    }
                     $internal = $form->getData();
                     $password = $encoder->encodePassword($internal->getPassword(), $internal->getSalt());
                     $internal->setPassword($password);
                     $internal->setCreatedBy($user);
                     $internal->setEnabled(TRUE);
-                    $internal->setIsBoss(FALSE);
                     $internal->setUsername($email);
                     $em->persist($internal);
                     $em->flush();

@@ -47,6 +47,12 @@
                 {% else %}
                 <dt>Archived because it has not been treated in time  </dt>
                 {% endif %}
+                {% if message.attachments is not empty %}
+                  <dt>Attachments: </dt>
+                  {% for attachment in message.attachments %}
+                      <dd><a href="{{ asset('attachments/'~attachment.path) }}" download="{{ asset('attachments/'~attachment.path) }}">File {{loop.index}}</a></dd>
+                  {% endfor %}
+                {% endif %}
             </dl>
          </div>
     </div>

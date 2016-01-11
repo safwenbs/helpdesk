@@ -43,7 +43,12 @@
                                     <td>{{message.demandType.demandType}}</td>
                                     <td>{{message.createdOn|date('d-m-Y')}}</td>
                                     <td>{{message.status}}</td>
-                                    <td style="text-align: center"><a href="{{path('treat_message',{'id':message.id})}}" class="btn btn-info {% if message.status not in ['opened','ongoing'] %}disabled{% endif %}">Treat</a></td>
+                                    <td style="text-align: center">
+                                        {% if message.historial is not empty %}
+                                            <a href="{{path('historial_message',{'id':message.id})}}" class="btn btn-info">Historics</a>
+                                        {% endif %}
+                                        <a href="{{path('treat_message',{'id':message.id})}}" class="btn btn-info {% if message.status not in ['opened','ongoing'] %}disabled{% endif %}">Treat</a>
+                                    </td>
                                 </tr>
                             
                         {% endfor %}

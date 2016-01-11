@@ -7,6 +7,7 @@
  */
 namespace Core\DashboardBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Message
@@ -152,6 +153,16 @@ class Message
      */
     private $contactType;
     
+    /**
+     * @var \Core\UsersBundle\Entity\User
+     *
+     * @ORM\ManyToOne(targetEntity="\Core\UsersBundle\Entity\User")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="canBeViewedBy", referencedColumnName="id")
+     * })
+     */
+    private $canBeViewedBy;
+    
     
 
     
@@ -173,6 +184,8 @@ class Message
         $this->isViewed = FALSE;
         $this->status = "opened";
         $this->canBeViewed = FALSE;
+        $this->historics = new ArrayCollection();
+        $this->attachments = new ArrayCollection();
     }
     
     function getCreatedOn() {
@@ -328,9 +341,32 @@ class Message
     function setCanBeViewed($canBeViewed) {
         $this->canBeViewed = $canBeViewed;
     }
-
-
     
+     /**
+     * @ORM\OneToMany(targetEntity="\Core\DashboardBundle\Entity\MessageHistorial", mappedBy="messageID" , cascade={"remove"})
+     */
+    protected $historics;
     
+    function getHistorial()
+    {
+        return $this->historics;
+    }
+    
+    /**
+     * @ORM\OneToMany(targetEntity="\Core\DashboardBundle\Entity\MessageAttachment", mappedBy="messageID" , cascade={"remove"})
+     */
+    protected $attachments;
+    
+    function getAttachments()
+    {
+        return $this->attachments;
+    }
+    
+    function getCanBeViewedBy() {
+        return $this->canBeViewedBy;
+    }
 
+    function setCanBeViewedBy(\Core\UsersBundle\Entity\User $canBeViewedBy = NULL) {
+        $this->canBeViewedBy = $canBeViewedBy;
+    }
 }

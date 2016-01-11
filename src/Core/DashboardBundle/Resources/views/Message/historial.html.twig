@@ -1,0 +1,78 @@
+{% extends  "::dashboard.html.twig" %}
+{% block title %} Historial {% endblock %}
+{% block header %} Request historial {% endblock %}
+{% block mainpage %}
+<div class="col-lg-12">
+    
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Request Historial Total {{historials.getTotalItemCount}}
+        </div>
+        <div class="panel-body">
+            {% if  historials.getTotalItemCount >0 %}
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Created on</th>
+                            <th>From service</th>
+                            <th>To service</th>
+                            <th>Status</th>
+                            <th>Text</th>
+                            <th>From user</th>
+                            <th>To user</th>
+                            <th>Action</th>
+                            <th>Attachments</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for historial in historials %}
+                            
+                                <tr>
+                                    <td>{{historial.createdOn|date('d-m-Y') }}</td>
+                                    <td>{{historial.servicefrom}}</td>
+                                    <td>{{historial.serviceto}}</td>
+                                    <td>{{historial.messageStatus}}</td>
+                                    <td>{{historial.textResponse}}</td>
+                                    <td>
+                                        {% if historial.userSender is not null %}
+                                            {{historial.userSender.firstname}} {{historial.userSender.lastname}}
+                                        {% else %}
+                                            none
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if historial.userReceiver is not null %}
+                                            {{historial.userReceiver.firstname}} {{historial.userReceiver.lastname}}
+                                        {% else %}
+                                            none
+                                        {% endif %}
+                                    <td>{{historial.action}}</td>
+                                    <td>
+                                        {% if historial.attachments is not empty %}
+                                            <ul>
+                                                {% for attachment in historial.attachments %}
+                                                    <li><a href="{{ asset('attachments/'~attachment.path) }}" download="{{ asset('attachments/'~attachment.path) }}">File {{loop.index}}</a></li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            
+                        {% endfor %}
+                        
+                    </tbody>
+                </table>
+                <div class="navigation" style="float: right;">
+                    {{ knp_pagination_render(historials) }}
+                </div>
+                        
+            </div>
+                        
+            <!-- /.table-responsive -->
+          {% endif %}  
+           
+        </div>
+    </div>
+</div>
+{% endblock %}

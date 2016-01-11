@@ -31,6 +31,9 @@ dependence_boss:
 set_boss_dependence:
     path:     /home/admin/internals/bosses/set
     defaults: { _controller: CoreDashboardBundle:Internal:setBoss }
+check_boss:
+    path:     /home/admin/internals/bosses/check/{role}
+    defaults: { _controller: CoreDashboardBundle:Internal:checkBoss }
 my_messages:
     path:     /home/external/message
     defaults: { _controller: CoreDashboardBundle:Message:list }
@@ -50,7 +53,7 @@ treat_message:
     path:     /home/internals/message/treat/{id}
     defaults: { _controller: CoreDashboardBundle:Message:treat }
 move_message:
-    path:     /home/internals/message/move/{id}/{service}
+    path:     /home/internals/message/move/{id}
     defaults: { _controller: CoreDashboardBundle:Message:move }
 close_message:
     path:     /home/internals/message/close/{id}
@@ -62,5 +65,8 @@ see_message:
     path:     /home/internals/message/type/see/{id}
     defaults: { _controller: CoreDashboardBundle:Message:see }
 share_message:
-    path:     /home/internals/message/share/{id}/{share}
+    path:     /home/internals/message/share/{id}
     defaults: { _controller: CoreDashboardBundle:Message:share }
+historial_message:
+    path:     /home/internals/message/historial/{id}
+    defaults: { _controller: CoreDashboardBundle:Message:historial }

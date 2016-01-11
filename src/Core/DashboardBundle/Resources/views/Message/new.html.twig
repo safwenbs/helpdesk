@@ -9,7 +9,7 @@
                 New message
             </div>
             <div class="panel-body">
-                <form role="form"  action="{{path('message_create')}}" method="POST">
+                <form role="form"  action="{{path('message_create')}}" method="POST" enctype="multipart/form-data">
                     <div class="form-group">
                           <label>Demand type</label>
                           <select name="demandType" class="form-control">
@@ -20,10 +20,14 @@
                     </div>
                     <div class="form-group">
                           <label>Contact type</label>
-                          <select name="contactType" class="form-control">
+                          <select name="contactType" class="form-control" onchange="handleContact(this);">
                               <option value="mail">Email</option>
                               <option value="adress">Adress</option>
                           </select>
+                    </div>
+                    <div class="form-group" id="user-adress" style="display: none">
+                          <label>Adress</label>
+                          <input type="text" name="adress" class="form-control" />
                     </div>
                     <div class="form-group">
                           <label>Subject</label>
@@ -32,6 +36,10 @@
                     <div class="form-group">
                           <label>Message</label>
                           <textarea name="message" class="form-control" required ></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Attach files</label>
+                        <input type="file" multiple name="attachments[]" class="form-control" />
                     </div>
                    
                     
@@ -42,4 +50,22 @@
         </div>
 
     </div>
+{% endblock %}
+{% block addScripts %}
+<script>
+function handleContact(item)
+{
+    var contact = $(item).val();
+    if(contact =='adress')
+    {
+        $("#user-adress input[type=text]").prop("required",true);
+        $("#user-adress").show();
+    }
+    else
+    {
+        $("#user-adress input[type=text]").prop("required",false);
+        $("#user-adress").hide();
+    }
+}
+</script>
 {% endblock %}

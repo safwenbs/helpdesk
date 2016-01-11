@@ -36,6 +36,19 @@
                         {{ form_widget(form.roles) }}
                         {{ form_errors(form.roles) }} 
                     </div>
+                    <div class="form-group" id="group-radio">
+                        <label>is Boss :</label>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="isBoss" value="1" onchange="handleBoss(this);">Yes
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input id="no-radio" type="radio" name="isBoss" value="0" onchange="handleBoss(this);" checked>No
+                            </label>
+                        </div>    
+                    </div>
                     <div class="form-group">
                         <label>Password</label>
                          {{ form_widget(form.password,  {'attr': {'required':'required','class':'form-control','type':'password'} }) }}
@@ -53,4 +66,64 @@
         </div>
 
     </div>
+<div class="modal fade" id="modal-confirm-boss" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                  <h4 class="modal-title">Change dependence boss</h4>
+              </div>
+              <div class="modal-body">
+                  
+              </div>
+              <div class="modal-footer">
+                  <a class="btn btn-success" data-dismiss="modal">Yes</a>
+                  <a class="btn btn-success" data-dismiss="modal" onclick="checkNo();">No</a>
+              </div>
+          </div>
+      </div>
+ </div>
+{% endblock %}
+{% block addScripts %}
+<script>
+function checkNo()
+{
+    $("#no-radio").prop("checked",true);
+}
+$("#helpdesk_add_internal_roles_0").change(function (){
+   handleBoss(); 
+});
+function handleBoss()
+{
+    var valeur = $("#group-radio input[type=radio]:checked").val();
+    if(valeur == 1)
+    {
+        var role = $("#helpdesk_add_internal_roles_0 option:selected").val();
+        var path= "{{path('check_boss',{'role':'item'})}}";
+        path = path.replace('item',role);
+        $.ajax({
+            url: path,
+            success: function (data, textStatus, jqXHR)
+            {
+                var json = JSON.parse(data);
+                var status = json.status;
+                var message = json.message;
+                console.log(status);
+                if(status==='ko')
+                {
+                    $("#modal-confirm-boss").find(".modal-body").text(message);
+                    $("#modal-confirm-boss").modal('show');
+                    
+                }
+            },
+            error: function (error, textStatus, errorThrown)
+            {
+                console.log(error);        
+            }
+            
+        });
+    }
+    
+}
+</script>
 {% endblock %}

@@ -64,6 +64,13 @@ class User extends BaseUser
      * @ORM\Column(name="isBoss", type="boolean", nullable=true)
      */
     private $isBoss;
+    
+     /**
+     * @var string
+     *
+     * @ORM\Column(name="adress", type="string", length=255, nullable=true)
+     */
+    private $adress;
 
     public function __construct()
     {
@@ -137,6 +144,16 @@ class User extends BaseUser
       parent::setEmail($email);
       $this->setUsername($email);
     }
+    
+    
+    function getAdress() {
+        return $this->adress;
+    }
+
+    function setAdress($adress) {
+        $this->adress = $adress;
+    }
+
 
 
 }

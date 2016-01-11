@@ -19,6 +19,10 @@
                 <dd>{{message.createdBy.firstname}} {{message.createdBy.lastname}}</dd>
                 <dt>Contact type: </dt>
                 <dd>{{message.contactType}}</dd>
+                {% if message.contactType == 'adress' %}
+                    <dt>User adress: </dt>
+                    <dd>{{message.createdBy.adress}}</dd>
+                {% endif %}
                 <dt>Demand type: </dt>
                 <dd>{{message.demandType.demandType}}</dd>
                 <dt>Current service: </dt>
@@ -39,6 +43,16 @@
                 {% endif %}
                 <dt>Can be viewed by other dependence users: </dt>
                 <dd>{% if message.canBeViewed %}Yes{% else %}No{% endif %}</dd>
+                {% if message.canBeViewed %}
+                    <dt>User in my dependence that can see this request: </dt>
+                    <dd>{{message.canBeViewedBy.firstname}} {{message.canBeViewedBy.lastname}}</dd>
+                {% endif %}
+                {% if message.attachments is not empty %}
+                  <dt>Attachments: </dt>
+                  {% for attachment in message.attachments %}
+                      <dd><a href="{{ asset('attachments/'~attachment.path) }}" download="{{ asset('attachments/'~attachment.path) }}">File {{loop.index}}</a></dd>
+                  {% endfor %}
+                {% endif %}
                 
             </dl>
                 {% if user.isBoss %}
@@ -46,7 +60,7 @@
                         {% if message.canBeViewed == 0 %}
                           <a href="#" class="btn btn-success" data-toggle="modal" data-target="#modal-share-request">Share same Dependence</a>
                         {% else %}
-                          <a href="#" class="btn btn-success" data-toggle="modal" data-target="#modal-share-request">Disable sharing with dependence users</a>
+                          <a href="#" class="btn btn-success" data-toggle="modal" data-target="#modal-share-request">Disable sharing</a>
                         {% endif %}
                     {% endif %}
                 <a href="#" class="btn btn-warning" data-toggle="modal" data-target="#modal-close-request">Close</a>
@@ -57,37 +71,35 @@
 <div class="modal fade" id="modal-move-request" tabindex="-1" role="dialog" aria-hidden="true">
       <div class="modal-dialog">
           <div class="modal-content">
+              <form action="{{path('move_message',{'id':message.id})}}" method="POST" enctype="multipart/form-data">
+                  
               <div class="modal-header">
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
                   <h4 class="modal-title">Move a request</h4>
               </div>
               <div class="modal-body">
-                  To which dependence you want to move this request ?
-                  <br/>
-                  <p style="margin-top: 20px;text-align: center;">
-                      {% if message.currentService == 'Reception' %}
-                          <a href="{{path('move_message',{'id':message.id,'service':'Accounting'})}}" class="btn btn-info">Accounting</a>
-                          <a href="{{path('move_message',{'id':message.id,'service':'Administration'})}}" class="btn btn-info">Administration</a>
-                          <a href="{{path('move_message',{'id':message.id,'service':'It'})}}" class="btn btn-info">IT</a>
-                      {% elseif message.currentService == 'Administration' %}
-                          <a href="{{path('move_message',{'id':message.id,'service':'Reception'})}}" class="btn btn-info">Reception</a>
-                          <a href="{{path('move_message',{'id':message.id,'service':'Accounting'})}}" class="btn btn-info">Accounting</a>
-                          <a href="{{path('move_message',{'id':message.id,'service':'It'})}}" class="btn btn-info">IT</a>
-                      {% elseif message.currentService == 'Accounting' %}
-                          <a href="{{path('move_message',{'id':message.id,'service':'Reception'})}}" class="btn btn-info">Reception</a>
-                          <a href="{{path('move_message',{'id':message.id,'service':'Administration'})}}" class="btn btn-info">Administration</a>
-                          <a href="{{path('move_message',{'id':message.id,'service':'It'})}}" class="btn btn-info">IT</a>
-                      {% else %}
-                          <a href="{{path('move_message',{'id':message.id,'service':'Reception'})}}" class="btn btn-info">Reception</a>
-                          <a href="{{path('move_message',{'id':message.id,'service':'Administration'})}}" class="btn btn-info">Administration</a>
-                          <a href="{{path('move_message',{'id':message.id,'service':'Accounting'})}}" class="btn btn-info">Accounting</a>
-                      {% endif %}
-                    
-                  </p>
+                      <div class="form-group">
+                          <label>To which dependence you want to move this request ?</label>
+                          <select name="toservice" class="form-control" required>
+                              {% for service in services %}
+                                  <option value="{{service}}">{{service}}</option>
+                              {% endfor %}
+                          </select>
+                      </div>
+                      <div class="form-group">
+                          <label>Type some text</label>
+                          <textarea name="textResponse" required class="form-control"></textarea>
+                      </div>
+                      <div class="form-group">
+                          <label>Attachments</label>
+                          <input type="file" multiple name="attachments[]" class="form-control" />
+                      </div>
               </div>
               <div class="modal-footer">
-                  <a class="btn btn-white" data-dismiss="modal">Close</a>
+                  <a class="btn btn-success" data-dismiss="modal">Close</a>
+                  <input type="submit" class="btn btn-success" value="Move" />
               </div>
+          </form>      
           </div>
       </div>
   </div>
@@ -116,19 +128,40 @@
   </div>
     <div class="modal fade" id="modal-share-request" tabindex="-1" role="dialog" aria-hidden="true">
       <div class="modal-dialog">
-          <div class="modal-content">
+        <div class="modal-content">
+          <form action="{% if message.canBeViewed == 0 %}{{path('share_message',{'id':message.id,'share':1})}}{% else %}{{path('share_message',{'id':message.id,'share':0})}}{% endif %}" method="POST" enctype="multipart/form-data">
               <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
                         <h4 class="modal-title">Share a request</h4>
                     </div>
                     <div class="modal-body">
-                        Are you sure to {% if message.canBeViewed == 0 %}share{% else %}disable sharing{% endif %} this request with your dependence users ?
+                        <input type="hidden" name="share" value="{% if message.canBeViewed == 0 %}1{% else %}0{% endif %}" />
+                     {% if message.canBeViewed == 0 %}
+                     <div class="form-group">
+                          <label>With which user from the dependence you want to share this request ?</label>
+                          <select name="receiverID" class="form-control" required>
+                              {% for internal in users %}
+                                  <option value="{{internal.id}}">{{internal.firstname}} {{internal.lastname}}</option>
+                              {% endfor %}
+                          </select>
+                      </div>
+                     {% endif %}
+                      <div class="form-group">
+                          <label>Type some text</label>
+                          <textarea name="textResponse" required class="form-control"></textarea>
+                      </div>
+                      <div class="form-group">
+                          <label>Attachments</label>
+                          <input type="file" multiple name="attachments[]" class="form-control" />
+                      </div>
+                    
                     </div>
                     <div class="modal-footer">
                         <a class="btn btn-white" data-dismiss="modal">No</a>
-                        <a href="{% if message.canBeViewed == 0 %}{{path('share_message',{'id':message.id,'share':1})}}{% else %}{{path('share_message',{'id':message.id,'share':0})}}{% endif %}" class="btn btn-success" >yes</a>
+                        <input type="submit" value="{% if message.canBeViewed == 0 %}Share{% else %}Unshare{% endif %}" class="btn btn-success" />
                     </div>
-          </div>
+          </form>
+        </div>
       </div>
   </div>
 {% endblock %}

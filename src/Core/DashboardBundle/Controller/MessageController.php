@@ -6,6 +6,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Core\DashboardBundle\Entity\Message;
+use Core\DashboardBundle\Entity\MessageAttachment;
+use Core\DashboardBundle\Entity\MessageHistorial;
+use Core\DashboardBundle\Entity\MessageHistorialAttachment;
 
 class MessageController extends Controller
 {
@@ -27,6 +30,8 @@ class MessageController extends Controller
         }
         return $randomString;
     }
+    
+
     public function createAction(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
@@ -34,6 +39,12 @@ class MessageController extends Controller
         $data = $request->request;
         
         $demandID = $data->get('demandType');
+        $adress = $data->get('adress');
+        if(!empty($adress))
+        {
+          $user->setAdress($adress);
+          $em->persist($user);
+        }
         $demand = $em->getRepository("CoreDashboardBundle:Demand")->find($demandID);
         $contactType = $data->get('contactType');
         $subject = $data->get('subject');
@@ -50,6 +61,32 @@ class MessageController extends Controller
         
         $em->persist($message);
         $em->flush();
+        
+        
+        $files = $request->files->get('attachments');
+        foreach ($files as $file)
+        {
+            if($file !=NULL)
+            {
+                $extension = $file->getClientOriginalExtension();
+                $name = $file->getClientOriginalName();
+                $type = $file->getClientMimeType();
+                $size = $file->getClientSize();
+                $path = "request_".$message->getId()."_".$name;
+                $file->move("attachments/",$path);
+                
+                $messageAttachment = new MessageAttachment();
+                $messageAttachment->setAttachType($type);
+                $messageAttachment->setExtension($extension);
+                $messageAttachment->setMessageID($message);
+                $messageAttachment->setPath($path);
+                $messageAttachment->setSize($size);
+                $em->persist($messageAttachment);
+                $em->flush();
+            }
+           
+        }
+        
         
         $this->get('session')->getFlashBag()->add('newMessage', 'Message sent to reception successfully , your request will be treated shortly , you will receive a response in few days !! ');
         $url = $this->generateUrl('my_messages');
@@ -101,7 +138,8 @@ class MessageController extends Controller
                                           WHERE m.currentService =:service
                                           AND m.status NOT IN ('closed','archived')
                                           AND m.canBeViewed = 1
-                                          ORDER BY m.createdOn DESC")->setParameter("service",$service);
+                                          AND m.canBeViewedBy =:id
+                                          ORDER BY m.createdOn DESC")->setParameters(array("service"=>$service,"id"=>$user->getId()));
             
         }
         $paginator  = $this->get('knp_paginator');
@@ -118,35 +156,162 @@ class MessageController extends Controller
         {
             $message->setViewedBy($user);
         }
+        $service =$message->getCurrentService();
+        if($service ==="Reception")
+        {
+          $services = array('Accounting','Administration','It');    
+        }
+        elseif ($service ==="Accounting")
+        {
+           $services = array('Reception','Administration','It');    
+        }
+        elseif ($service ==="Administration")
+        {
+           $services = array('Reception','Accounting','It');    
+        }
+        else
+        {
+            $services = array('Reception','Accounting','Administration');  
+        }
         $message->setIsViewed(TRUE);
         $message->setStatus("ongoing");
         $em->persist($message);
         $em->flush();
-        return $this->render('CoreDashboardBundle:Message:treat.html.twig',array('user'=>$user,'message'=>$message));
-    }
-    public function moveAction($id,$service)
-    {
-        $em = $this->getDoctrine()->getManager();
         
+        $users = $this->getusersService($service);
+        return $this->render('CoreDashboardBundle:Message:treat.html.twig',array('user'=>$user,'message'=>$message,'services'=>$services,'users'=>$users));
+    }
+    public function moveAction($id,Request $request)
+    {
+        $data = $request->request;
+        $service = $data->get('toservice');
+        
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->container->get('security.context')->getToken()->getUser();
         $message = $em->getRepository("CoreDashboardBundle:Message")->find($id);
+        $oldService = $message->getCurrentService();
         $message->setCurrentService($service);
         $message->setCanBeViewed(FALSE);
         $em->persist($message);
         $em->flush();
+        
+        $textResponse = $data->get('textResponse');
+        $messageHistorial = new MessageHistorial();
+        $messageHistorial->setMessageID($message);
+        $messageHistorial->setMessageStatus($message->getStatus());
+        $messageHistorial->setServiceFrom($oldService);
+        $messageHistorial->setServiceTo($service);
+        $messageHistorial->setTextResponse($textResponse);
+        $messageHistorial->setUserSender($user);
+        $receiver = $this->getBossDependence($service);
+        $messageHistorial->setUserReceiver($receiver);
+        $messageHistorial->setAction('move');
+        $em->persist($messageHistorial);
+        $em->flush();
+        
+        $files = $request->files->get('attachments');
+        foreach ($files as $file)
+        {
+            if($file !=NULL)
+            {
+                $extension = $file->getClientOriginalExtension();
+                $name = $file->getClientOriginalName();
+                $type = $file->getClientMimeType();
+                $size = $file->getClientSize();
+                $path = "historial_".$messageHistorial->getId()."_request_".$message->getId()."_".$name;
+                $file->move("attachments/",$path);
+                
+                $messageHistorialAttachment = new MessageHistorialAttachment();
+                $messageHistorialAttachment->setAttachType($type);
+                $messageHistorialAttachment->setExtension($extension);
+                $messageHistorialAttachment->setMessageHistorialID($messageHistorial);
+                $messageHistorialAttachment->setPath($path);
+                $messageHistorialAttachment->setSize($size);
+                $em->persist($messageHistorialAttachment);
+                $em->flush();
+            }
+           
+        }
         
         $this->get('session')->getFlashBag()->add('moveRequest', 'Request moved to '.$service.' service successfully !! ');
         $url = $this->generateUrl('messages_internals');
         $response = new RedirectResponse($url);
         return $response;
     }
-    public function shareAction($id,$share)
+    public function shareAction($id,Request $request)
     {
+        $data = $request->request;
         $em = $this->getDoctrine()->getManager();
+        $user = $this->container->get('security.context')->getToken()->getUser();
+        
+        $share = $data->get("share");
+        $receiverID = $data->get('receiverID');
+        if($receiverID !=NULL)
+        {
+           $receiver = $em->getRepository("CoreUsersBundle:User")->find($receiverID);    
+        }
         
         $message = $em->getRepository("CoreDashboardBundle:Message")->find($id);
         $message->setCanBeViewed($share);
+        if($receiverID !=NULL)
+        {
+           $message->setCanBeViewedBy($receiver);     
+        }
+        else $message->setCanBeViewedBy(NULL);
+       
         $em->persist($message);
         $em->flush();
+        
+        
+        $service = $message->getCurrentService();
+        $textResponse = $data->get('textResponse');
+        $messageHistorial = new MessageHistorial();
+        $messageHistorial->setMessageID($message);
+        $messageHistorial->setMessageStatus($message->getStatus());
+        $messageHistorial->setServiceFrom($service);
+        $messageHistorial->setServiceTo($service);
+        $messageHistorial->setTextResponse($textResponse);
+        $messageHistorial->setUserSender($user);
+        if($receiverID !=NULL)
+        {
+          $messageHistorial->setUserReceiver($receiver);
+        }
+        if($share)
+        {
+           $messageHistorial->setAction('share');    
+        }
+        else
+        {
+            $messageHistorial->setAction('disable sharing');
+        }
+        
+        $em->persist($messageHistorial);
+        $em->flush();
+        
+        $files = $request->files->get('attachments');
+        foreach ($files as $file)
+        {
+            if($file !=NULL)
+            {
+                $extension = $file->getClientOriginalExtension();
+                $name = $file->getClientOriginalName();
+                $type = $file->getClientMimeType();
+                $size = $file->getClientSize();
+                $path = "historial_".$messageHistorial->getId()."_request_".$message->getId()."_".$name;
+                $file->move("attachments/",$path);
+                
+                $messageHistorialAttachment = new MessageHistorialAttachment();
+                $messageHistorialAttachment->setAttachType($type);
+                $messageHistorialAttachment->setExtension($extension);
+                $messageHistorialAttachment->setMessageHistorialID($messageHistorial);
+                $messageHistorialAttachment->setPath($path);
+                $messageHistorialAttachment->setSize($size);
+                $em->persist($messageHistorialAttachment);
+                $em->flush();
+            }
+           
+        }
+        
         if ($share)
         {
             $notice = "Request shared with other dependence users successfully.";
@@ -178,15 +343,34 @@ class MessageController extends Controller
         $em->persist($message);
         $em->flush();
         
+        $service = $message->getCurrentService();
+        $messageHistorial = new MessageHistorial();
+        $messageHistorial->setMessageID($message);
+        $messageHistorial->setMessageStatus($message->getStatus());
+        $messageHistorial->setServiceFrom($service);
+        $messageHistorial->setServiceTo($service);
+        $messageHistorial->setTextResponse($responseText);
+        $messageHistorial->setUserSender($user);
+        $messageHistorial->setUserReceiver($user);
+        $messageHistorial->setAction('close');    
+        $em->persist($messageHistorial);
+        $em->flush();
+        
+        
         //SEND EMAIL TO THE EXTERNAL
-//        $mail = \Swift_Message::newInstance()
-//                 ->setSubject("Your request has been treated and closed ")
-//                 ->setFrom('safwen.bensalem@mapp-net.com')
-//                 ->setTo($message->getCreatedBy()->getEmail())
-//                 ->setContentType("text/html")
-//                 ->setBody('CoreDashboardBundle:Message:mail.html.twig',array('message'=>$message))
-//                 ;
-//        $this->get('mailer')->send($mail);
+        /*
+         if($message->getContactType()==='mail')
+         { 
+                $mail = \Swift_Message::newInstance()
+                        ->setSubject("Your request has been treated and closed ")
+                        ->setFrom('safwen.bensalem@mapp-net.com')
+                        ->setTo($message->getCreatedBy()->getEmail())
+                        ->setContentType("text/html")
+                        ->setBody('CoreDashboardBundle:Message:mail.html.twig',array('message'=>$message))
+                        ;
+               $this->get('mailer')->send($mail);
+         }
+         */
         
         $this->get('session')->getFlashBag()->add('closeRequest', 'Request closed successfully , the response has been sent to the external user !! ');
         $url = $this->generateUrl('messages_internals');
@@ -215,6 +399,87 @@ class MessageController extends Controller
         $user = $this->container->get('security.context')->getToken()->getUser();
         $message = $em->getRepository("CoreDashboardBundle:Message")->find($id);
         return $this->render('CoreDashboardBundle:Message:see.html.twig',array('user'=>$user,'message'=>$message));
+
+    }
+    
+    public function getBossDependence($service)
+    {
+        $em = $this->getDoctrine()->getManager();
+        if($service === "Reception")
+        {
+            $role = "ROLE_INTERNAL_RECEPTION";
+        }
+        elseif($service === "Accounting")
+        {
+            $role = "ROLE_INTERNAL_ACCOUNTING";
+        }
+        elseif($service === "Administration")
+        {
+            $role = "ROLE_INTERNAL_ADMINISTRATION";
+        }
+        else
+        {
+            $role = "ROLE_INTERNAL_IT";
+        }
+        $getBoss = $em->createQuery("SELECT u FROM CoreUsersBundle:User u
+                                     WHERE u.roles LIKE :role
+                                     AND u.isBoss =1
+                                     AND u.enabled = 1")
+                     ->setParameter('role','%"' . $role . '"%')
+                     ->getResult();
+        if($getBoss)
+        {
+            $boss = $getBoss[0];
+        }
+        else
+        {
+            $boss = NULL;
+        }
+        
+        return $boss;
+    }
+    
+    public function getusersService($service)
+    {
+        $em = $this->getDoctrine()->getManager();
+        if($service === "Reception")
+        {
+            $role = "ROLE_INTERNAL_RECEPTION";
+        }
+        elseif($service === "Accounting")
+        {
+            $role = "ROLE_INTERNAL_ACCOUNTING";
+        }
+        elseif($service === "Administration")
+        {
+            $role = "ROLE_INTERNAL_ADMINISTRATION";
+        }
+        else
+        {
+            $role = "ROLE_INTERNAL_IT";
+        }
+        $getUsers = $em->createQuery("SELECT u FROM CoreUsersBundle:User u
+                                     WHERE u.roles LIKE :role
+                                     AND u.isBoss =0
+                                     AND u.enabled = 1")
+                     ->setParameter('role','%"' . $role . '"%')
+                     ->getResult();
+        
+        return $getUsers;
+    }
+    
+    public function historialAction($id,Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->container->get('security.context')->getToken()->getUser();
+        $message = $em->getRepository("CoreDashboardBundle:Message")->find($id);
+        
+        $historial = $message->getHistorial();
+        $paginator  = $this->get('knp_paginator');
+        
+        $pagination = $paginator->paginate($historial, $request->query->getInt('page', 1),10);
+   
+        return $this->render('CoreDashboardBundle:Message:historial.html.twig',array('user'=>$user,'historials'=>$pagination));
 
     }
 }
