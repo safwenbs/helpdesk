@@ -70,3 +70,6 @@ share_message:
 historial_message:
     path:     /home/internals/message/historial/{id}
     defaults: { _controller: CoreDashboardBundle:Message:historial }
+my_notifs:
+    path:     /home/internals/notifs
+    defaults: { _controller: CoreDashboardBundle:Message:notifs }

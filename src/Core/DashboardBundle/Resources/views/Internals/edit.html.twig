@@ -34,10 +34,9 @@
                     <div class="form-group">
                         <label>Role</label>
                         <select name="role" class="form-control">
-                            <option value="ROLE_INTERNAL_RECEPTION" {% if internal.granted('ROLE_INTERNAL_RECEPTION') %} selected{% endif %}>Reception</option>
-                            <option value="ROLE_INTERNAL_ACCOUNTING" {% if internal.granted('ROLE_INTERNAL_ACCOUNTING') %} selected{% endif %}>Accounting</option>
-                            <option value="ROLE_INTERNAL_ADMINISTRATION" {% if internal.granted('ROLE_INTERNAL_ADMINISTRATION') %} selected{% endif %}>Administration</option>
-                            <option value="ROLE_INTERNAL_IT" {% if internal.granted('ROLE_INTERNAL_IT') %} selected{% endif %}>IT</option>
+                            {% for group in groups %}
+                                <option value="{{group.id}}" {% if internal.dependecyID.id == group.id %} selected{% endif %}>{{group.name|capitalize}}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     

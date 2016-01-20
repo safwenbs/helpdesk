@@ -8,12 +8,8 @@ security:
     role_hierarchy:
         ROLE_ADMIN:       ROLE_ADMIN
         ROLE_EXTERNAL:    ROLE_EXTERNAL
-        ROLE_INTERNAL_RECEPTION:    ROLE_INTERNAL_RECEPTION
-        ROLE_INTERNAL_ACCOUNTING:   ROLE_INTERNAL_ACCOUNTING
-        ROLE_INTERNAL_ADMINISTRATION: ROLE_INTERNAL_ADMINISTRATION
-        ROLE_INTERNAL_IT: ROLE_INTERNAL_IT 
+        ROLE_INTERNAL:    ROLE_INTERNAL
         
-
     providers:
         fos_userbundle:
             id: fos_user.user_provider.username_email
@@ -40,8 +36,9 @@ security:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/profile/, roles: [ROLE_EXTERNAL, ROLE_INTERNAL_RECEPTION, ROLE_INTERNAL_ACCOUNTING, ROLE_INTERNAL_ADMINISTRATION, ROLE_INTERNAL_IT,ROLE_ADMIN ] }
+        - { path: ^/profile/, roles: [ROLE_EXTERNAL, ROLE_INTERNAL,ROLE_ADMIN ] }
         - { path: ^/dashboard/home/admin, role: ROLE_ADMIN }
         - { path: ^/dashboard/home/external, role: ROLE_EXTERNAL }
-        - { path: ^/dashboard/home/internals ,roles: [ROLE_INTERNAL_RECEPTION, ROLE_INTERNAL_ACCOUNTING, ROLE_INTERNAL_ADMINISTRATION, ROLE_INTERNAL_IT ] }
-        
+        - { path: ^/dashboard/home/internals ,role: ROLE_INTERNAL }
+        - { path: ^/group, role: ROLE_ADMIN }
+        - { path: ^/crone, role: IS_AUTHENTICATED_ANONYMOUSLY }

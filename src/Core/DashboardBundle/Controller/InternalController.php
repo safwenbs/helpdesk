@@ -15,39 +15,9 @@ class InternalController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $user = $this->container->get('security.context')->getToken()->getUser();
-        /* RECEPTION */
-        $recpetion = "ROLE_INTERNAL_RECEPTION";
-        $receptionQuery   = "SELECT u FROM CoreUsersBundle:User u
-                             WHERE u.roles LIKE :reception
-                             AND u.enabled =1";
-        $recpetionInternals = $em->createQuery($receptionQuery)->setParameter('reception','%"' . $recpetion . '"%')->getResult();
         
-        /* ACCOUNTING */
-        $accounting = "ROLE_INTERNAL_ACCOUNTING";
-        $accountingQuery   = "SELECT u FROM CoreUsersBundle:User u
-                             WHERE u.roles LIKE :accounting
-                             AND u.enabled =1";
-        $accountingInternals = $em->createQuery($accountingQuery)->setParameter('accounting','%"' . $accounting . '"%')->getResult();
-        
-        
-        /* ADMINISTRATION */
-        
-        $administration = "ROLE_INTERNAL_ADMINISTRATION";
-        $administrationQuery   = "SELECT u FROM CoreUsersBundle:User u
-                                  WHERE u.roles LIKE :administration
-                                  AND u.enabled =1";
-        $administrationInternals = $em->createQuery($administrationQuery)->setParameter('administration','%"' . $administration . '"%')->getResult();
-        
-        /*** IT ****/
-        
-        $it = "ROLE_INTERNAL_IT";
-        $itQuery   = "SELECT u FROM CoreUsersBundle:User u
-                      WHERE u.roles LIKE :it
-                      AND u.enabled =1";
-        $itInternals = $em->createQuery($itQuery)->setParameter('it','%"' . $it . '"%')->getResult();
-       
-        
-        return $this->render('CoreDashboardBundle:Internals:boss.html.twig',array('user'=>$user,'receptions'=>$recpetionInternals,'accountings'=>$accountingInternals,'administrations'=>$administrationInternals,'its'=>$itInternals));
+        $groups = $em->getRepository("CoreUsersBundle:Group")->findAll(); 
+        return $this->render('CoreDashboardBundle:Internals:boss.html.twig',array('user'=>$user,'groups'=>$groups));
     
         
     }
@@ -61,11 +31,17 @@ class InternalController extends Controller
         {
             foreach ($data as $key=>$value)
             {
+                $query1 = $em->createQuery("UPDATE CoreUsersBundle:User u
+                                            SET u.isBoss = 0
+                                            WHERE u.dependecyID = :dependecyID")
+                            ->setParameter('dependecyID',$key)
+                            ->getResult();
+                
                 $query = $em->createQuery("UPDATE CoreUsersBundle:User u
                                            SET u.isBoss = 1
-                                           WHERE u.roles LIKE :role
+                                           WHERE u.dependecyID = :dependecyID
                                            AND u.id =:id")
-                            ->setParameters(array('role'=>'%"' . $key . '"%','id'=>$value))
+                            ->setParameters(array('dependecyID'=>$key,'id'=>$value))
                             ->getResult();
             }
             $this->get('session')->getFlashBag()->add('setBoss', 'Dependence bosses configured successfully.');
@@ -85,9 +61,9 @@ class InternalController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $isBoss = $em->createQuery("SELECT u FROM CoreUsersBundle:User u
-                                    WHERE u.roles LIKE :role
+                                    WHERE u.dependecyID =:role
                                     AND u.isBoss =1")
-                     ->setParameter('role','%"' . $role . '"%')
+                     ->setParameter('role',$role)
                      ->getResult();
              
         if(empty($isBoss))
@@ -151,11 +127,11 @@ class InternalController extends Controller
                     $isBoss = $request->request->get('isBoss');
                     if($isBoss ==='1')
                     {
-                        $role = $form->getData()->getRoles()[0];
+                        $role = $form->getData()->getDependecyID();
                         $query = $em->createQuery("UPDATE CoreUsersBundle:User u
                                                    SET u.isBoss = 0
-                                                   WHERE u.roles LIKE :role")
-                            ->setParameter('role','%"' . $role . '"%')
+                                                   WHERE u.dependecyID = :role")
+                            ->setParameter('role',$role)
                             ->getResult();
                         $internal->setIsBoss(TRUE);
                     }
@@ -163,12 +139,16 @@ class InternalController extends Controller
                     {
                         $internal->setIsBoss(FALSE);
                     }
+                    
                     $internal = $form->getData();
                     $password = $encoder->encodePassword($internal->getPassword(), $internal->getSalt());
                     $internal->setPassword($password);
                     $internal->setCreatedBy($user);
                     $internal->setEnabled(TRUE);
                     $internal->setUsername($email);
+                    $internal->addRole('ROLE_INTERNAL');
+                    
+                    
                     $em->persist($internal);
                     $em->flush();
 
@@ -210,8 +190,12 @@ class InternalController extends Controller
         $user = $this->container->get('security.context')->getToken()->getUser();
         
         $internal = $em->getRepository("CoreUsersBundle:User")->find($id);
+        $groups = $em->getRepository("CoreUsersBundle:Group")->findAll();
         
-        return $this->render('CoreDashboardBundle:Internals:edit.html.twig',array('user'=>$user,'internal'=>$internal));
+        return $this->render('CoreDashboardBundle:Internals:edit.html.twig',array('user'=>$user,
+                                                                                  'internal'=>$internal,
+                                                                                   'groups'=>$groups
+                                                                                 ));
         
     }
     
@@ -231,18 +215,8 @@ class InternalController extends Controller
         $internal->setFirstName($firstname);
         $internal->setLastName($lastname);
         $internal->setEnabled($enabled);
-        if ($internal->isGranted('ROLE_INTERNAL_ACCOUNTING')) {
-            $oldRole = 'ROLE_INTERNAL_ACCOUNTING';
-        } elseif ($internal->isGranted('ROLE_INTERNAL_ADMINISTRATION')) {
-            $oldRole = 'ROLE_INTERNAL_ADMINISTRATION';
-        } elseif ($internal->isGranted('ROLE_INTERNAL_RECEPTION')) {
-            $oldRole = 'ROLE_INTERNAL_RECEPTION';
-        } else {
-            $oldRole = 'ROLE_INTERNAL_IT';
-        }
-        
-        $internal->removeRole($oldRole);
-        $internal->addRole($role);
+        $dependecy = $em->getRepository("CoreUsersBundle:Group")->find($role);
+        $internal->setDependecyID($dependecy);
         
         $em->persist($internal);
         $em->flush();

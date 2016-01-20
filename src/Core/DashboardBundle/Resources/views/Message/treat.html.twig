@@ -80,9 +80,15 @@
               <div class="modal-body">
                       <div class="form-group">
                           <label>To which dependence you want to move this request ?</label>
+                          {% if services is empty %}
+                              <div class="alert alert-danger">
+                                   You can't move this requests either because you haven't create any other dependecies or
+                                   because you should set depndecies bosses first because they are the only users who can receive requests
+                               </div>
+                          {% endif %}
                           <select name="toservice" class="form-control" required>
                               {% for service in services %}
-                                  <option value="{{service}}">{{service}}</option>
+                                  <option value="{{service['name']|capitalize}}">{{service['name']|capitalize}}</option>
                               {% endfor %}
                           </select>
                       </div>

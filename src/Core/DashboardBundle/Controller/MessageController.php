@@ -116,15 +116,7 @@ class MessageController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $user = $this->container->get('security.context')->getToken()->getUser();
-        if ($user->isGranted('ROLE_INTERNAL_RECEPTION')) {
-            $service = 'Reception';
-        } elseif ($user->isGranted('ROLE_INTERNAL_ACCOUNTING')) {
-            $service = 'Accounting';
-        } elseif ($user->isGranted('ROLE_INTERNAL_ADMINISTRATION')) {
-            $service = 'Administration';
-        } else {
-            $service = 'It';
-        }
+        $service = $user->getDependecyID()->getName();
         if($user->getIsBoss())
         {
           $messages = $em->createQuery("SELECT m FROM CoreDashboardBundle:Message m
@@ -157,28 +149,19 @@ class MessageController extends Controller
             $message->setViewedBy($user);
         }
         $service =$message->getCurrentService();
-        if($service ==="Reception")
-        {
-          $services = array('Accounting','Administration','It');    
-        }
-        elseif ($service ==="Accounting")
-        {
-           $services = array('Reception','Administration','It');    
-        }
-        elseif ($service ==="Administration")
-        {
-           $services = array('Reception','Accounting','It');    
-        }
-        else
-        {
-            $services = array('Reception','Accounting','Administration');  
-        }
+        
+        
+        $services = $em->createQuery("SELECT g.name FROM CoreUsersBundle:Group g
+                                      WHERE g.id IN (SELECT identity(u.dependecyID) FROM CoreUsersBundle:User u WHERE u.isBoss =1 AND u.enabled =1 )
+                                      AND g.name != :service")
+                        ->setParameter("service",$service)
+                        ->getResult();
         $message->setIsViewed(TRUE);
         $message->setStatus("ongoing");
         $em->persist($message);
         $em->flush();
         
-        $users = $this->getusersService($service);
+        $users = $this->getusersService($user->getDependecyID()->getID());
         return $this->render('CoreDashboardBundle:Message:treat.html.twig',array('user'=>$user,'message'=>$message,'services'=>$services,'users'=>$users));
     }
     public function moveAction($id,Request $request)
@@ -405,27 +388,13 @@ class MessageController extends Controller
     public function getBossDependence($service)
     {
         $em = $this->getDoctrine()->getManager();
-        if($service === "Reception")
-        {
-            $role = "ROLE_INTERNAL_RECEPTION";
-        }
-        elseif($service === "Accounting")
-        {
-            $role = "ROLE_INTERNAL_ACCOUNTING";
-        }
-        elseif($service === "Administration")
-        {
-            $role = "ROLE_INTERNAL_ADMINISTRATION";
-        }
-        else
-        {
-            $role = "ROLE_INTERNAL_IT";
-        }
+        $groupManager = $this->get('fos_user.group_manager');
+        $dependecy = $groupManager->findGroupByName($service);
         $getBoss = $em->createQuery("SELECT u FROM CoreUsersBundle:User u
-                                     WHERE u.roles LIKE :role
+                                     WHERE u.dependecyID = :dependecyID
                                      AND u.isBoss =1
                                      AND u.enabled = 1")
-                     ->setParameter('role','%"' . $role . '"%')
+                     ->setParameter('dependecyID',$dependecy->getID())
                      ->getResult();
         if($getBoss)
         {
@@ -439,30 +408,15 @@ class MessageController extends Controller
         return $boss;
     }
     
-    public function getusersService($service)
+    public function getusersService($dependecyID)
     {
         $em = $this->getDoctrine()->getManager();
-        if($service === "Reception")
-        {
-            $role = "ROLE_INTERNAL_RECEPTION";
-        }
-        elseif($service === "Accounting")
-        {
-            $role = "ROLE_INTERNAL_ACCOUNTING";
-        }
-        elseif($service === "Administration")
-        {
-            $role = "ROLE_INTERNAL_ADMINISTRATION";
-        }
-        else
-        {
-            $role = "ROLE_INTERNAL_IT";
-        }
+        
         $getUsers = $em->createQuery("SELECT u FROM CoreUsersBundle:User u
-                                     WHERE u.roles LIKE :role
-                                     AND u.isBoss =0
-                                     AND u.enabled = 1")
-                     ->setParameter('role','%"' . $role . '"%')
+                                      WHERE u.dependecyID = :dependecyID
+                                      AND u.isBoss =0
+                                      AND u.enabled = 1")
+                     ->setParameter('dependecyID',$dependecyID)
                      ->getResult();
         
         return $getUsers;
@@ -480,6 +434,30 @@ class MessageController extends Controller
         $pagination = $paginator->paginate($historial, $request->query->getInt('page', 1),10);
    
         return $this->render('CoreDashboardBundle:Message:historial.html.twig',array('user'=>$user,'historials'=>$pagination));
+
+    }
+    
+    public function notifsAction(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->container->get('security.context')->getToken()->getUser();
+        $notifs = $user->getNotifications();
+        $items = array();
+        foreach ($notifs as $notif)
+        {
+            if($notif->getIsViewed()== FALSE)
+            {
+                array_push($items, $notif);
+            }
+            $notif->setIsViewed(TRUE);
+            $em->persist($notif);
+            $em->flush();
+        }
+        $paginator  = $this->get('knp_paginator');
+        
+        $pagination = $paginator->paginate($items, $request->query->getInt('page', 1),4);
+   
+        return $this->render('CoreDashboardBundle:Message:notifs.html.twig',array('user'=>$user,'notifs'=>$pagination));
 
     }
 }

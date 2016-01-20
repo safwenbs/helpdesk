@@ -52,6 +52,16 @@ class User extends BaseUser
     private $createdBy;
     
     /**
+     * @var \Core\UsersBundle\Entity\Group
+     *
+     * @ORM\ManyToOne(targetEntity="\Core\UsersBundle\Entity\Group")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="dependecyID", referencedColumnName="id")
+     * })
+     */
+    private $dependecyID;
+    
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="createdOn", type="datetime", nullable=true)
@@ -139,6 +149,16 @@ class User extends BaseUser
         return $this->messages;
     }
     
+    /**
+     * @ORM\OneToMany(targetEntity="\Core\DashboardBundle\Entity\NotificationUsers", mappedBy="userID" , cascade={"remove"})
+     */
+    protected $notifications;
+    
+    function getNotifications()
+    {
+        return $this->notifications;
+    }
+    
     public function setEmail($email)
     {
       parent::setEmail($email);
@@ -154,6 +174,12 @@ class User extends BaseUser
         $this->adress = $adress;
     }
 
+    function getDependecyID() {
+        return $this->dependecyID;
+    }
 
+    function setDependecyID(\Core\UsersBundle\Entity\Group $dependecyID) {
+        $this->dependecyID = $dependecyID;
+    }
 
 }

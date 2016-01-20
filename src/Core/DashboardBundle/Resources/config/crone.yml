@@ -1,0 +1,6 @@
+archive_messages:
+    path:     /archive
+    defaults: { _controller: CoreDashboardBundle:Crone:archive }
+alert_notifs:
+    path:     /alert
+    defaults: { _controller: CoreDashboardBundle:Crone:alert }

@@ -59,15 +59,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if internal.granted('ROLE_INTERNAL_RECEPTION') %}
-                                    Internal Reception
-                                {% elseif internal.granted('ROLE_INTERNAL_ACCOUNTING') %}
-                                    Internal Accounting
-                                {% elseif internal.granted('ROLE_INTERNAL_ADMINISTRATION') %}
-                                    Internal Administration
-                                {% elseif internal.granted('ROLE_INTERNAL_IT') %}
-                                    Internal IT
-                                {% endif %}
+                                {{internal.dependecyID.name|capitalize}}
                             </td>
                             <td>
                                 {% if internal.isBoss %}
@@ -78,8 +70,6 @@
                             </td>
                             <td>
                                 <a href="{{path('internal_edit',{'id':internal.id})}}"  class="btn btn-primary">Edit</a>
-{#                                <a href="#" data-internal-id="{{internal.id}}" data-internal-name="{{internal.firstname}} {{internal.lastname}}" data-toggle="modal" data-target="#modal-delete-internal" class="btn btn-danger btn-delete-internal">Delete</a>#}
-                                
                             </td>
                         </tr>
                         {% endfor %}

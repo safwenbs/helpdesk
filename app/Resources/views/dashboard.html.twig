@@ -100,6 +100,17 @@
                                     <li>
                                         <a href="{{path('new_internal')}}">Add an internal</a>
                                     </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#"><i class="fa fa-desktop"></i> Dependecies<span class="fa arrow"></span></a>
+                                <ul class="nav nav-second-level">
+                                    <li>
+                                        <a href="{{path('fos_user_group_list')}}">View all</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{path('fos_user_group_new')}}">Add a dependecy</a>
+                                    </li>
                                     <li>
                                         <a href="{{path('dependence_boss')}}">Set dependence bosses</a>
                                     </li>
@@ -134,6 +145,9 @@
                                         <a href="{{path('messages_see_type',{'type':'closed'})}}">Closed requests</a>
                                     </li>
                                 </ul>
+                            </li>
+                            <li>
+                                <a href="{{path('my_notifs')}}"><i class="fa fa-envelope-o"></i> My notifications</a>
                             </li>
                         {% endif %}
                     </ul>

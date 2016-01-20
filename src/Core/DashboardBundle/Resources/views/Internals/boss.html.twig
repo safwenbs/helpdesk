@@ -14,38 +14,16 @@
             </div>
             <div class="panel-body">
                 <form role="form"  action="{{path('set_boss_dependence')}}" method="POST">
-                    <div class="form-group">
-                        <label>Reception Dependence</label>
-                        <select name="ROLE_INTERNAL_RECEPTION" class="form-control">
-                            {% for reception in receptions %}
-                                <option value="{{reception.id}}" {% if reception.isBoss %}selected{% endif %}>{{reception.firstname}} {{reception.lastname}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Accounting Dependence</label>
-                        <select name="ROLE_INTERNAL_ACCOUNTING" class="form-control">
-                            {% for accounting in accountings %}
-                                <option value="{{accounting.id}}" {% if accounting.isBoss %}selected{% endif %}>{{accounting.firstname}} {{accounting.lastname}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Administration Dependence</label>
-                        <select name="ROLE_INTERNAL_ADMINISTRATION"  class="form-control">
-                            {% for administration in administrations %}
-                                <option value="{{administration.id}}" {% if administration.isBoss %}selected{% endif %}>{{administration.firstname}} {{administration.lastname}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>IT Dependence</label>
-                        <select name="ROLE_INTERNAL_IT"  class="form-control">
-                            {% for it in its %}
-                                <option value="{{it.id}}" {% if it.isBoss %}selected{% endif %}>{{it.firstname}} {{it.lastname}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                    {% for group in groups %}
+                        <div class="form-group">
+                            <label>{{group.name|capitalize}} Dependence</label>
+                            <select name="{{group.id}}" class="form-control">
+                                {% for internal in group.users %}
+                                    <option value="{{internal.id}}" {% if internal.isBoss %}selected{% endif %}>{{internal.firstname}} {{internal.lastname}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% endfor %}
                     <input type="submit" class="btn btn-primary" value="Confirm" />
                 </form>
             </div>

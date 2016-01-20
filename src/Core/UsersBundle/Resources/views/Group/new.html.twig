@@ -1,0 +1,31 @@
+{% extends  "::dashboard.html.twig" %}
+{% block title %}New dependecy{% endblock %}
+{% block header %}New dependecy {% endblock %}
+{% block mainpage %}
+    <div class="col-lg-6">
+        {% for flashMessage in app.session.flashbag.get('errorGroup') %}
+            <div class="alert alert-danger">
+                {{ flashMessage }}
+            </div>
+        {% endfor %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                New dependecy
+            </div>
+            <div class="panel-body">
+                <form role="form"  action="{{ path('fos_user_group_new') }}" {{ form_enctype(form) }} method="POST">
+                    {{ form_widget(form._token) }}
+                    <div class="form-group">
+                        <label>Name</label>
+                         {{ form_widget(form.name,  {'attr': {'class':'form-control','required':'required'} }) }}
+                         {{ form_errors(form.name) }}
+                    </div>
+                    {{ form_rest(form) }}
+                    
+                    <input type="submit" class="btn btn-primary" value="Create" />
+                </form>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

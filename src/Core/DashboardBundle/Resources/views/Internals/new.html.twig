@@ -30,11 +30,10 @@
                          {{ form_widget(form.email,  {'attr': {'required':'required','class':'form-control','type':'email'} }) }}
                          {{ form_errors(form.email) }}
                     </div>
-                    
                     <div class="form-group">
                         <label>Role</label>
-                        {{ form_widget(form.roles) }}
-                        {{ form_errors(form.roles) }} 
+                        {{ form_widget(form.dependecyID) }}
+                        {{ form_errors(form.dependecyID) }} 
                     </div>
                     <div class="form-group" id="group-radio">
                         <label>is Boss :</label>
@@ -90,7 +89,7 @@ function checkNo()
 {
     $("#no-radio").prop("checked",true);
 }
-$("#helpdesk_add_internal_roles_0").change(function (){
+$("#helpdesk_add_internal_dependecyID").change(function (){
    handleBoss(); 
 });
 function handleBoss()
@@ -98,7 +97,7 @@ function handleBoss()
     var valeur = $("#group-radio input[type=radio]:checked").val();
     if(valeur == 1)
     {
-        var role = $("#helpdesk_add_internal_roles_0 option:selected").val();
+        var role = $("#helpdesk_add_internal_dependecyID option:selected").val();
         var path= "{{path('check_boss',{'role':'item'})}}";
         path = path.replace('item',role);
         $.ajax({
